@@ -2,20 +2,22 @@
 
 Game::Game()
 {
-	window = new sf::RenderWindow(sf::VideoMode({ 1000, 1000 }), "Super Ultimate Speedrunners Game");
-	
-	player = new sf::RectangleShape();
-	player->setSize(sf::Vector2f(100, 50));
-	player->setOutlineColor(sf::Color::Red);
-	player->setOutlineThickness(5);
-	player->setPosition({10, 20});
+	window = new sf::RenderWindow(sf::VideoMode({ 1200, 900 }), "TerraDash");
+	window->setFramerateLimit(144);
+
+	runner.setFillColor(sf::Color::Yellow);
+	runner.setPosition({50, 50});
+	runner.setSize({100, 100});
+
+	sf::Image world;
+	world.loadFromFile("Textures/world1.png");
+	level.createFromImage(world);
 }
 
 
 Game::~Game()
 {
 	delete window;
-	delete player;
 }
 
 
@@ -54,15 +56,15 @@ void Game::processEvents()
 
 void Game::update(const sf::Time& dt)
 {
-
 }
 
 
 void Game::render()
 {
 	window->clear();
-	
-	window->draw(*player);
 
+	window->draw(runner);
+	level.draw(*window);
+	
 	window->display();
 }
