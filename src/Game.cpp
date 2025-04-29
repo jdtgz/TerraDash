@@ -5,7 +5,7 @@ Game::Game()
 	window = new sf::RenderWindow(sf::VideoMode({ 1200, 900 }), "TerraDash");
 	window->setFramerateLimit(144);
 
-	runner.setFillColor(sf::Color::Yellow);
+	runner.setFillColor(sf::Color::Red);
 	runner.setPosition({50, 50});
 	runner.setSize({100, 100});
 

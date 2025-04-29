@@ -13,6 +13,7 @@ Level::~Level()
 
 void Level::generate()
 {
+
 }
 
 
@@ -45,11 +46,12 @@ void Level::draw(sf::RenderWindow &window) const
         {
             if(cell)
             {
-                std::cout << "drawing block...\n";
                 sf::RectangleShape block;
                 block.setFillColor(sf::Color::Green);
-                block.setSize({20,20});
-                block.setPosition({20 * x + 20 / 2.0f, 20 * y + 20 / 2.0f});
+                block.setOutlineThickness(1);
+                block.setOutlineColor(sf::Color::Blue);
+                block.setSize({20.f,20.f});
+                block.setPosition({20.f * x + 20.f / 2.0f, 20.f * y + 20.f / 2.0f});
                 
                 window.draw(block);
             }

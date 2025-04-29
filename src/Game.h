@@ -1,11 +1,8 @@
-/*
- * Purpose: 
- */
+#pragma once
 
- #pragma once
- #include <SFML/Graphics.hpp>
- #include "Game Elements/Level.h"
- 
+#include <SFML/Graphics.hpp>
+#include "Game Elements/Level.h"
+
  
 class Game
 {
