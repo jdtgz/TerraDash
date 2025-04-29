@@ -6,8 +6,10 @@ std::map<textures::id, sf::Texture*> Resources::textureMap;
 
 Resources::Resources()
 {
-	// Load all necessary PNG files
-	load(textures::WORLD, "Textures/world1.png");
+	// Load all the player images
+	load(textures::id::Pink, "Textures/Players/Pink_Player.png");
+	load(textures::id::White, "Textures/Players/White_Player.png");
+	load(textures::id::Blue, "Textures/Players/Blue_Player.png");
 }
 
 

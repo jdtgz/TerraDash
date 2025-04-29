@@ -2,6 +2,8 @@
 
 #include <SFML/Graphics.hpp>
 #include "Game Elements/Level.h"
+#include "Graphics/Resources.h"
+#include "Graphics/Animation.h"
 
  
 class Game
@@ -17,10 +19,14 @@ class Game
         void update(const sf::Time& dt);
         void render();
 
+        // Window Elements
         sf::RenderWindow* window;
         sf::Time timePerFrame = sf::seconds(1.f / 60.f);
 
-        sf::RectangleShape runner;
+        // Game Elements
+        sf::Sprite* player;
+        Animation playerAnimations;
+        Resources gameTextures;
         Level level;
 };
 

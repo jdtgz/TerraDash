@@ -5,9 +5,10 @@ Game::Game()
 	window = new sf::RenderWindow(sf::VideoMode({ 1200, 900 }), "TerraDash");
 	window->setFramerateLimit(144);
 
-	runner.setFillColor(sf::Color::Red);
-	runner.setPosition({50, 50});
-	runner.setSize({100, 100});
+	player = new sf::Sprite(Resources::get(textures::Blue));
+	player->setTextureRect(sf::IntRect({0, 0}, {32 ,32}));
+	player->setPosition({50, 50});
+	player->setScale({3,3});
 
 	sf::Image world;
 	world.loadFromFile("Textures/world1.png");
@@ -18,6 +19,7 @@ Game::Game()
 Game::~Game()
 {
 	delete window;
+	delete player;
 }
 
 
@@ -63,7 +65,7 @@ void Game::render()
 {
 	window->clear();
 
-	window->draw(runner);
+	window->draw(*player);
 	level.draw(*window);
 	
 	window->display();

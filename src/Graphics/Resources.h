@@ -7,13 +7,14 @@
 
 namespace textures
 {
-	enum id { PLAYER = 0, WORLD };
+	enum id { Pink = 0, White, Blue };
 }
 
 class Resources
 {
     public:
         Resources(); 
+        Resources(std::vector<std::string> files);
         ~Resources(); 
 
         static void load(const textures::id&, const std::string&); 
