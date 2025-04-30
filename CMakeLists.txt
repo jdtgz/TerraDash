@@ -15,9 +15,12 @@ FetchContent_MakeAvailable(SFML)
 add_executable(main 
     src/main.cpp
     src/Game.cpp
+    "src/Game Elements/Collidable.cpp"
     "src/Game Elements/Level.cpp"
+    "src/Game Elements/Player.cpp"
     src/Graphics/Animation.cpp
     src/Graphics/Resources.cpp
+
     )
 target_compile_features(main PRIVATE cxx_std_17)
 target_link_libraries(main PRIVATE SFML::Graphics)

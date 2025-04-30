@@ -1,15 +1,15 @@
 #include "Resources.h"
 
 
-std::map<textures::id, sf::Texture*> Resources::textureMap;
+std::map<textures::ID, sf::Texture*> Resources::textureMap;
 
 
 Resources::Resources()
 {
 	// Load all the player images
-	load(textures::id::Pink, "Textures/Players/Pink_Player.png");
-	load(textures::id::White, "Textures/Players/White_Player.png");
-	load(textures::id::Blue, "Textures/Players/Blue_Player.png");
+	load(textures::ID::Pink, "Textures/Players/Pink_Player.png");
+	load(textures::ID::White, "Textures/Players/White_Player.png");
+	load(textures::ID::Blue, "Textures/Players/Blue_Player.png");
 }
 
 
@@ -22,7 +22,7 @@ Resources::~Resources()
 }
 
 
-void Resources::load(const textures::id& id, const std::string& filename)
+void Resources::load(const textures::ID& id, const std::string& filename)
 {
 	sf::Texture* txture = new sf::Texture();
 	txture->loadFromFile(filename);
@@ -30,9 +30,9 @@ void Resources::load(const textures::id& id, const std::string& filename)
 }
 
 
-sf::Texture& Resources::get(const textures::id& id)
+sf::Texture& Resources::get(const textures::ID& id)
 {
-	std::map<textures::id, sf::Texture*>::iterator 
+	std::map<textures::ID, sf::Texture*>::iterator 
 	found = textureMap.find(id);
 
 

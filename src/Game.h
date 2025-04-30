@@ -1,9 +1,11 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include "Game Elements/Collidable.h"
 #include "Game Elements/Level.h"
-#include "Graphics/Resources.h"
+#include "Game Elements/Player.h"
 #include "Graphics/Animation.h"
+#include "Graphics/Resources.h"
 
  
 class Game
@@ -24,9 +26,8 @@ class Game
         sf::Time timePerFrame = sf::seconds(1.f / 60.f);
 
         // Game Elements
-        sf::Sprite* player;
-        Animation playerAnimations;
         Resources gameTextures;
+        Player player;
         Level level;
 };
 

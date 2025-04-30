@@ -35,6 +35,21 @@ void Animation::setUp(sf::Texture& t, const int& x, const int& y,
 }
 
 
+void Animation::setUp(sf::Texture& t, sf::Vector2i pos, sf::Vector2i size, const int& tFrames)
+{
+	texture = &t;
+	nFrames = tFrames;
+	frames = new sf::IntRect[nFrames];
+
+	// cycle through and initialize all the frames 
+	// *No spacing between sprite boxes 
+	for (int i = 0; i < nFrames; i++)
+	{
+		frames[i] = sf::IntRect({pos.x + i * size.x, pos.y}, {size.x, size.y});
+	}
+}
+
+
 // applies the right textureRect to the animation and scales it
 void Animation::applyToSprite(sf::Sprite& s) const
 {

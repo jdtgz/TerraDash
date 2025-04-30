@@ -7,7 +7,7 @@
 
 namespace textures
 {
-	enum id { Pink = 0, White, Blue };
+	enum ID { Pink = 0, White, Blue };
 }
 
 class Resources
@@ -17,8 +17,8 @@ class Resources
         Resources(std::vector<std::string> files);
         ~Resources(); 
 
-        static void load(const textures::id&, const std::string&); 
-        static sf::Texture& get(const textures::id&); 
+        static void load(const textures::ID&, const std::string&); 
+        static sf::Texture& get(const textures::ID&); 
     private:
-        static std::map<textures::id, sf::Texture*> textureMap; 
+        static std::map<textures::ID, sf::Texture*> textureMap; 
 };
