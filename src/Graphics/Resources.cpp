@@ -10,6 +10,14 @@ Resources::Resources()
 	load(textures::ID::Pink, "Textures/Players/Pink_Player.png");
 	load(textures::ID::White, "Textures/Players/White_Player.png");
 	load(textures::ID::Blue, "Textures/Players/Blue_Player.png");
+
+	// Load all the world building images
+	load(textures::ID::LevelTiles, "Textures/Worlds/LevelTiles.png");
+	load(textures::ID::Back1, "Textures/Worlds/Background1.png");
+	load(textures::ID::Back2, "Textures/Worlds/Background2.png");
+	load(textures::ID::Back3, "Textures/Worlds/Background3.png");
+	load(textures::ID::Back4, "Textures/Worlds/Background4.png");
+	load(textures::ID::Back5, "Textures/Worlds/Background5.png");
 }
 
 

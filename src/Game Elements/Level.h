@@ -16,4 +16,5 @@ class Level
         void draw(sf::RenderWindow& window) const;
     private:
         std::vector<std::vector<int>> world;
+        const int BLOCK_SIZE = 32; 
 };

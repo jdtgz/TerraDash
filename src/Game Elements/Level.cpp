@@ -39,6 +39,7 @@ void Level::createFromImage(const sf::Image &levelImage)
 
 void Level::draw(sf::RenderWindow &window) const
 {
+    sf::IntRect tmp({32,0},{BLOCK_SIZE, BLOCK_SIZE});
     int x = 0;
     for(const auto& column : world)
     {
@@ -47,12 +48,13 @@ void Level::draw(sf::RenderWindow &window) const
         {
             if(cell)
             {
-                sf::RectangleShape block;
-                block.setFillColor(sf::Color::Green);
-                block.setOutlineThickness(1);
-                block.setOutlineColor(sf::Color::Blue);
-                block.setSize({20.f,20.f});
-                block.setPosition({20.f * x + 20.f / 2.0f, 20.f * y + 20.f / 2.0f});
+                sf::Sprite block(Resources::get(textures::LevelTiles));
+
+
+                sf::Vector2f pos({BLOCK_SIZE * x + BLOCK_SIZE / 2.0f, BLOCK_SIZE * y + BLOCK_SIZE / 2.0f});
+
+                block.setTextureRect(tmp);
+                block.setPosition(pos);
                 
                 window.draw(block);
             }

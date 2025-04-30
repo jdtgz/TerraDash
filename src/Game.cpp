@@ -7,7 +7,7 @@ Game::Game()
 	window->setFramerateLimit(144);
 
 	sf::Image world;
-	world.loadFromFile("Textures/world1.png");
+	world.loadFromFile("Textures/Worlds/world1.png");
 	level.createFromImage(world);
 }
 
@@ -15,7 +15,6 @@ Game::Game()
 Game::~Game()
 {
 	delete window;
-	//delete player;
 }
 
 

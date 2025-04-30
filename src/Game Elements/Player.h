@@ -3,10 +3,9 @@
 #include <SFML/Graphics.hpp>
 #include "../Graphics/Animation.h"
 #include "../Graphics/Resources.h"
-#include "Collidable.h"
 
 
-class Player : public Collidable
+class Player
 {
     public:
         Player();

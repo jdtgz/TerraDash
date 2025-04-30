@@ -12,15 +12,22 @@ FetchContent_Declare(SFML
     SYSTEM)
 FetchContent_MakeAvailable(SFML)
 
+FetchContent_Declare(
+  Box2D
+  GIT_REPOSITORY https://github.com/erincatto/box2d.git
+  GIT_TAG v2.4.1
+)
+FetchContent_MakeAvailable(Box2D)
+
 add_executable(main 
     src/main.cpp
     src/Game.cpp
-    "src/Game Elements/Collidable.cpp"
     "src/Game Elements/Level.cpp"
     "src/Game Elements/Player.cpp"
     src/Graphics/Animation.cpp
     src/Graphics/Resources.cpp
 
     )
+target_include_directories(main PRIVATE ${box2d_SOURCE_DIR}/include)
 target_compile_features(main PRIVATE cxx_std_17)
-target_link_libraries(main PRIVATE SFML::Graphics)
+target_link_libraries(main PRIVATE SFML::Graphics box2d)
