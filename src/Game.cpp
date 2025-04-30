@@ -46,8 +46,19 @@ void Game::processEvents()
 {
 	while (const std::optional event = window->pollEvent())
 	{
+		
 		if (event->is<sf::Event::Closed>())
+		{
 			window->close();
+		}
+		else if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>())
+		{
+			player.keyPressed(keyPressed->scancode);
+		}
+		else if (const auto* keyReleased = event->getIf<sf::Event::KeyReleased>())
+		{
+			player.keyReleased(keyReleased->scancode);		
+		}
 	}
 }
 

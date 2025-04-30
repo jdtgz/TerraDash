@@ -34,7 +34,7 @@ class Animation
 		// total number of frames in animation
 		int nFrames; 
 		// amount of time a single frame will be on screen
-		static constexpr float HOLDTIME = 0.1f; 
+		static constexpr float HOLDTIME = 0.05f; 
 		// image to pull sprite rects from 
 		sf::Texture* texture; 
 		// array of IntRects that contain boxes of each frame 
