@@ -12,7 +12,7 @@ class Level
         ~Level();
 
         void generate();
-        void createFromImage(const sf::Image& levelImage);
+        sf::Vector2f createFromImage(const sf::Image& levelImage);
         void draw(sf::RenderWindow& window) const;
     private:
         std::vector<std::vector<int>> world;

@@ -6,7 +6,7 @@
 #include "Graphics/Animation.h"
 #include "Graphics/Resources.h"
 
- 
+
 class Game
 {
     public:
@@ -14,15 +14,16 @@ class Game
         ~Game();
 
         void run();
-
     private:
         void processEvents();
-        void update(const sf::Time& dt);
+        void update(const float dt);
+        void updateView();
         void render();
 
         // Window Elements
-        sf::RenderWindow* window;
-        sf::Time timePerFrame = sf::seconds(1.f / 60.f);
+        sf::RenderWindow* window; 
+        sf::View camera;
+        const float ZOOM = 5.0f;
 
         // Game Elements
         Resources gameTextures;

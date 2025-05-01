@@ -136,9 +136,15 @@ void Player::draw(sf::RenderWindow& window) const
 }
 
 
+void Player::setPos(sf::Vector2f pos)
+{
+    p_visual->setPosition(pos);
+}
+
+
 void Player::initAnimations()
 {
-    sf::Texture* t = &Resources::get(textures::Pink);
+    sf::Texture* t = &Resources::get(textures::Blue);
     p_visual = new sf::Sprite(*t);
 
     sf::Vector2i size({32, 32});
@@ -176,5 +182,4 @@ void Player::initAnimations()
     // Start player with the idle animation and set his position
     curr_animation = state::IDLE_RIGHT;
     p_animations[int(curr_animation)].applyToSprite(*p_visual);
-    p_visual->setPosition({50, 100});
 }
