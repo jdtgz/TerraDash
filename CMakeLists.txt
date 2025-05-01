@@ -27,7 +27,9 @@ add_executable(main
     src/Graphics/Animation.cpp
     src/Graphics/Resources.cpp
 
-    )
+)
+
+file(COPY ${CMAKE_SOURCE_DIR}/src/Textures DESTINATION ${CMAKE_BINARY_DIR}/bin/Debug)
 target_include_directories(main PRIVATE ${box2d_SOURCE_DIR}/include)
 target_compile_features(main PRIVATE cxx_std_17)
 target_link_libraries(main PRIVATE SFML::Graphics box2d)
