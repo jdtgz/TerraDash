@@ -7,36 +7,30 @@ Game::Game()
 	window->setFramerateLimit(144);
 
 	sf::Image world;
-	world.loadFromFile("Textures/world1.png");
-	level.createFromImage(world);
+	world.loadFromFile("Textures/Worlds/world1.png");
+	player.setPos(level.createFromImage(world));
 }
 
 
 Game::~Game()
 {
 	delete window;
-	//delete player;
 }
 
 
 void Game::run()
 {
 	sf::Clock clock;
-	sf::Time timeSinceLastTick = sf::Time::Zero;
 
 	while (window->isOpen())
 	{
 		processEvents();
 
 		// advance clock
-		timeSinceLastTick += clock.restart();
+		float deltaTime = clock.restart().asSeconds();
 
-		while (timeSinceLastTick > timePerFrame)
-		{
-			timeSinceLastTick -= timePerFrame;
-			processEvents();
-			update(timeSinceLastTick);
-		}
+		processEvents();
+		update(deltaTime);
 		render();
 	}
 }
@@ -63,16 +57,34 @@ void Game::processEvents()
 }
 
 
-void Game::update(const sf::Time& dt)
+void Game::update(const float dt)
 {
-	player.update(dt.asSeconds());
+	player.update(dt);
+}
+
+
+void Game::updateView()
+{
+	float aspect = (float)window->getSize().x / (float)window->getSize().y;
+
+	sf::Vector2f size;
+	if(aspect < 1.0f)
+	{
+		size = sf::Vector2f(ZOOM, ZOOM / aspect);
+	}
+	else
+	{
+		size = sf::Vector2f(ZOOM * aspect, ZOOM);
+	}
+	camera.setSize(size);
 }
 
 
 void Game::render()
 {
 	window->clear();
-
+	
+	window->setView(camera);
 	player.draw(*window);
 	level.draw(*window);
 	

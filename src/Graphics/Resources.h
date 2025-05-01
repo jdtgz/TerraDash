@@ -7,7 +7,8 @@
 
 namespace textures
 {
-	enum ID { Pink = 0, White, Blue };
+	enum ID { Pink = 0, White, Blue, 
+        LevelTiles, Back1, Back2, Back3, Back4, Back5 };
 }
 
 class Resources

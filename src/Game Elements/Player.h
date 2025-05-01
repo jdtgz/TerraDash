@@ -3,10 +3,9 @@
 #include <SFML/Graphics.hpp>
 #include "../Graphics/Animation.h"
 #include "../Graphics/Resources.h"
-#include "Collidable.h"
 
 
-class Player : public Collidable
+class Player
 {
     public:
         Player();
@@ -16,6 +15,9 @@ class Player : public Collidable
         void keyReleased(sf::Keyboard::Scancode key);
         void update(const float& dt);
         void draw(sf::RenderWindow& window) const;
+
+        void setPos(sf::Vector2f pos);
+        sf::Vector2f getPos() { return p_visual->getPosition(); }
     private:
         // Loads all approprite textures for the player and inits the idle 
         // animation by default and applies it to the sprite obj p_visual

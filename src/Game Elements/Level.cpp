@@ -18,10 +18,11 @@ void Level::generate()
 }
 
 
-void Level::createFromImage(const sf::Image &levelImage)
+sf::Vector2f Level::createFromImage(const sf::Image &levelImage)
 {
     world.clear();
     world = std::vector(levelImage.getSize().x, std::vector<int>(levelImage.getSize().y, 0));
+    sf::Vector2f playerPos;
 
     for(int x = 0; x < world.size(); x++)
     {
@@ -31,28 +32,38 @@ void Level::createFromImage(const sf::Image &levelImage)
             
             if(pixel == sf::Color::Black)
                 world[x][y] = 1;
+            if(pixel == sf::Color::Blue)
+            {
+                world[x][y] = 2;
+                playerPos.x = BLOCK_SIZE * x + BLOCK_SIZE / 2.0f;
+                playerPos.y = BLOCK_SIZE * y + BLOCK_SIZE / 2.0f;
+            }
         }
     }
 
+    return playerPos;
 }
 
 
 void Level::draw(sf::RenderWindow &window) const
 {
+    sf::IntRect tmp({32,0},{BLOCK_SIZE, BLOCK_SIZE});
+
     int x = 0;
     for(const auto& column : world)
     {
         int y = 0;
         for(const auto& cell : column)
         {
-            if(cell)
+            if(cell == 1)
             {
-                sf::RectangleShape block;
-                block.setFillColor(sf::Color::Green);
-                block.setOutlineThickness(1);
-                block.setOutlineColor(sf::Color::Blue);
-                block.setSize({20.f,20.f});
-                block.setPosition({20.f * x + 20.f / 2.0f, 20.f * y + 20.f / 2.0f});
+                sf::Sprite block(Resources::get(textures::LevelTiles));
+
+
+                sf::Vector2f pos({BLOCK_SIZE * x + BLOCK_SIZE / 2.0f, BLOCK_SIZE * y + BLOCK_SIZE / 2.0f});
+
+                block.setTextureRect(tmp);
+                block.setPosition(pos);
                 
                 window.draw(block);
             }
