@@ -8,7 +8,7 @@ Player::Player(sf::Vector2f p_pos) : pos(p_pos)
     // Create the body definition
     b2BodyDef def{};
     def.type = b2_dynamicBody;
-    def.position.Set(pos.x, pos.y);
+    def.position.Set(pos.x / SCALE, pos.y / SCALE);
 
     // Create the body using pointers
     body = Level::world.CreateBody(&def);
@@ -142,15 +142,16 @@ void Player::keyReleased(sf::Keyboard::Scancode key)
 
 void Player::update(const float& dt)
 {
-    pos = sf::Vector2f({body->GetPosition().x, body->GetPosition().y});
+    pos = sf::Vector2f({body->GetPosition().x * SCALE, body->GetPosition().y * SCALE});
     
-    s.setSize({64.0f, 64.0f});
+    s.setSize({32.0f, 32.0f});
     s.setFillColor(sf::Color::Transparent);
     s.setOutlineThickness(1);
     s.setOutlineColor(sf::Color::Red);
     s.setPosition(pos);
-    p_visual->setPosition(pos);
 
+
+    p_visual->setPosition(pos);
     p_animations[int(curr_animation)].update(dt);
     p_animations[int(curr_animation)].applyToSprite(*p_visual);
 }

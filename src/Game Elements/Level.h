@@ -7,6 +7,8 @@
 #include <vector>
 #include "../Graphics/Resources.h"
 
+constexpr float SCALE = 30.0f;
+
 
 class Level
 {

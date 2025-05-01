@@ -31,21 +31,21 @@ sf::Vector2f Level::createFromImage(const sf::Image &levelImage)
 
                 // Create the body definition
                 b2BodyDef def{};
-                def.position.Set(BLOCK_SIZE * x + BLOCK_SIZE / 2.0f, 
-                    BLOCK_SIZE * y + BLOCK_SIZE / 2.0f);
+                def.position.Set((BLOCK_SIZE * x + BLOCK_SIZE / 2.0f) / SCALE, 
+                    (BLOCK_SIZE * y + BLOCK_SIZE / 2.0f) / SCALE);
 
                 // Create the body using pointers
                 b2Body* body = world.CreateBody(&def);
 
                 // Create the polygon (square) shape for visuals
                 b2PolygonShape shape{};
-                shape.SetAsBox(BLOCK_SIZE / 2.0f, BLOCK_SIZE / 2.0f);
+                shape.SetAsBox(BLOCK_SIZE / 2.0f / SCALE, BLOCK_SIZE / 2.0f / SCALE);
                 body->CreateFixture(&shape, 0.0f);
             }
             if(pixel == sf::Color::Blue)
             {
                 grid[x][y] = 2;
-                playerPos.x = BLOCK_SIZE * x + BLOCK_SIZE / 2.0f;
+                playerPos.x = BLOCK_SIZE * x + BLOCK_SIZE / 2.0f; 
                 playerPos.y = BLOCK_SIZE * y + BLOCK_SIZE / 2.0f;
             }
         }
@@ -71,17 +71,15 @@ void Level::draw(sf::RenderWindow &window) const
                 
                 sf::Sprite block(Resources::get(textures::LevelTiles), tmp);
                 block.setPosition(pos);
-
-                /*
-                if(x < 10 && y < 10)
-                {
-                    std::cout << "grid[" << x << "][" << y << "]:\n";
-                    std::cout << "Pos: [ " << pos.x << ", " << pos.y << " ]\n";
-                    std::cout << "Origin ( " << block.getOrigin().x  << ", " << block.getOrigin().y << " )\n" << std::endl;
-                }
-                */
+                
+                sf::RectangleShape s(sf::Vector2f({(float)BLOCK_SIZE, (float)BLOCK_SIZE}));
+                s.setFillColor(sf::Color::Transparent);
+                s.setOutlineThickness(1);
+                s.setOutlineColor(sf::Color::Blue);
+                s.setPosition(pos);
                 
                 window.draw(block);
+                window.draw(s);
             }
             y++;
         }
