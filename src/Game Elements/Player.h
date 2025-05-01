@@ -20,9 +20,6 @@ class Player
         void keyReleased(sf::Keyboard::Scancode key);
         void update(const float& dt);
         void draw(sf::RenderWindow& window) const;
-
-        void setPos(sf::Vector2f pos);
-        sf::Vector2f getPos() { return p_visual->getPosition(); }
     private:
         // Loads all approprite textures for the player and inits the idle 
         // animation by default and applies it to the sprite obj p_visual
@@ -52,13 +49,18 @@ class Player
         state curr_animation;
 
         // Handles all the movement aspects of the player
+        enum class move
+        {
+            RIGHT = 0,
+            LEFT, 
+            IN_AIR,
+            COUNT
+        };
+        bool heading[move::COUNT];
         bool key_movement[state::COUNT];
-        sf::Vector2f pos; 
 
         b2Body* body;
-          
-         sf::RectangleShape s;
-
+        
         // Player attributes
         int hp;
     };

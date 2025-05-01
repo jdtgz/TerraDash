@@ -62,8 +62,8 @@ void Game::processEvents()
 
 void Game::update(const float dt)
 {
-	level.update(dt);
 	player->update(dt);
+	level.update(dt);
 }
 
 
@@ -88,7 +88,7 @@ void Game::render()
 {
 	window->clear();
 	
-	window->setView(camera);
+	//window->setView(camera);
 	player->draw(*window);
 	level.draw(*window);
 	

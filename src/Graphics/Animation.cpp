@@ -55,7 +55,6 @@ void Animation::applyToSprite(sf::Sprite& s) const
 {
 	s.setTexture(*texture);
 	s.setTextureRect(frames[iFrame]);
-	//s.setScale({2, 2}); 
 }
 
 
