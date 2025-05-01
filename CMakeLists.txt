@@ -19,17 +19,26 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(Box2D)
 
-add_executable(main 
-    src/main.cpp
-    src/Game.cpp
-    "src/Game Elements/Level.cpp"
-    "src/Game Elements/Player.cpp"
-    src/Graphics/Animation.cpp
-    src/Graphics/Resources.cpp
-
+FetchContent_Declare(
+        cpp-httplib
+        GIT_REPOSITORY https://github.com/yhirose/cpp-httplib.git
+        GIT_TAG        v0.20.0 # Use the desired version
 )
+FetchContent_MakeAvailable(cpp-httplib)
+
+# Collect all .cpp files in src and its subdirectories
+file(GLOB_RECURSE SRC_FILES ${CMAKE_SOURCE_DIR}/src/*.cpp)
+
+# Collect all .h files in include
+include_directories(${CMAKE_SOURCE_DIR}/include)
+
+add_executable(main ${SRC_FILES})
 
 file(COPY ${CMAKE_SOURCE_DIR}/src/Textures DESTINATION ${CMAKE_BINARY_DIR}/bin/Debug)
 target_include_directories(main PRIVATE ${box2d_SOURCE_DIR}/include)
 target_compile_features(main PRIVATE cxx_std_17)
-target_link_libraries(main PRIVATE SFML::Graphics box2d)
+target_link_libraries(main PRIVATE 
+  SFML::Graphics 
+  box2d
+  httplib::httplib
+)
