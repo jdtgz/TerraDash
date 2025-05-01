@@ -6,15 +6,18 @@ Game::Game()
 	window = new sf::RenderWindow(sf::VideoMode({ 1200, 900 }), "TerraDash");
 	window->setFramerateLimit(144);
 
-	sf::Image world;
-	world.loadFromFile("Textures/Worlds/world1.png");
-	player.setPos(level.createFromImage(world));
+	level.init();
+	
+	sf::Image lvl;
+	lvl.loadFromFile("Textures/Worlds/world1.png");
+	player = new Player(level.createFromImage(lvl));
 }
 
 
 Game::~Game()
 {
 	delete window;
+	delete player;
 }
 
 
@@ -47,11 +50,11 @@ void Game::processEvents()
 		}
 		else if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>())
 		{
-			player.keyPressed(keyPressed->scancode);
+			player->keyPressed(keyPressed->scancode);
 		}
 		else if (const auto* keyReleased = event->getIf<sf::Event::KeyReleased>())
 		{
-			player.keyReleased(keyReleased->scancode);		
+			player->keyReleased(keyReleased->scancode);		
 		}
 	}
 }
@@ -59,7 +62,8 @@ void Game::processEvents()
 
 void Game::update(const float dt)
 {
-	player.update(dt);
+	level.update(dt);
+	player->update(dt);
 }
 
 
@@ -85,7 +89,7 @@ void Game::render()
 	window->clear();
 	
 	window->setView(camera);
-	player.draw(*window);
+	player->draw(*window);
 	level.draw(*window);
 	
 	window->display();

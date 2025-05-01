@@ -1,14 +1,19 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include <box2d/b2_world.h>
+#include <box2d/b2_body.h>
+#include <box2d/b2_polygon_shape.h>
+#include <box2d/b2_fixture.h>
 #include "../Graphics/Animation.h"
 #include "../Graphics/Resources.h"
+#include "Level.h"
 
 
 class Player
 {
     public:
-        Player();
+        Player(sf::Vector2f p_pos);
         ~Player();
 
         void keyPressed(sf::Keyboard::Scancode key);
@@ -43,14 +48,17 @@ class Player
         
         // Handles all visual aspects of the player 
         sf::Sprite* p_visual;
-        textures::ID p_texture;
         Animation p_animations[int(state::COUNT)];
         state curr_animation;
 
         // Handles all the movement aspects of the player
         bool key_movement[state::COUNT];
-        sf::Vector2f vel; 
+        sf::Vector2f pos; 
 
-        // Game attributes
+        b2Body* body;
+          
+         sf::RectangleShape s;
+
+        // Player attributes
         int hp;
     };

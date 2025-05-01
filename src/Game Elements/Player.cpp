@@ -1,16 +1,33 @@
 #include "Player.h"
 
 
-Player::Player()
+Player::Player(sf::Vector2f p_pos) : pos(p_pos)
 {
     initAnimations();
+
+    // Create the body definition
+    b2BodyDef def{};
+    def.type = b2_dynamicBody;
+    def.position.Set(pos.x, pos.y);
+
+    // Create the body using pointers
+    body = Level::world.CreateBody(&def);
+
+    // Create the polygon (square) shape for visuals
+    b2PolygonShape shape{};
+    shape.SetAsBox(0.5f, 1.0f);
+
+    b2FixtureDef fixDef{};
+    fixDef.shape = &shape;
+    fixDef.density = 1.0f;
+    fixDef.friction = 0.3f;
+    body->CreateFixture(&fixDef);
 
     // Set all movement to false since player is not initially moving
     for(int i = 0; i < int(state::COUNT); i++)
         key_movement[i] = false;
 
-    vel.x = 0.f;
-    vel.y = 0.f;
+    hp = 10;
 }
 
 
@@ -125,6 +142,15 @@ void Player::keyReleased(sf::Keyboard::Scancode key)
 
 void Player::update(const float& dt)
 {
+    pos = sf::Vector2f({body->GetPosition().x, body->GetPosition().y});
+    
+    s.setSize({64.0f, 64.0f});
+    s.setFillColor(sf::Color::Transparent);
+    s.setOutlineThickness(1);
+    s.setOutlineColor(sf::Color::Red);
+    s.setPosition(pos);
+    p_visual->setPosition(pos);
+
     p_animations[int(curr_animation)].update(dt);
     p_animations[int(curr_animation)].applyToSprite(*p_visual);
 }
@@ -133,6 +159,7 @@ void Player::update(const float& dt)
 void Player::draw(sf::RenderWindow& window) const
 {
     window.draw(*p_visual);
+    window.draw(s);
 }
 
 
@@ -144,7 +171,7 @@ void Player::setPos(sf::Vector2f pos)
 
 void Player::initAnimations()
 {
-    sf::Texture* t = &Resources::get(textures::Blue);
+    sf::Texture* t = &Resources::get(textures::White);
     p_visual = new sf::Sprite(*t);
 
     sf::Vector2i size({32, 32});
