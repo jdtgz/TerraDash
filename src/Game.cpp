@@ -1,6 +1,5 @@
 #include "Game.h"
 
-
 Game::Game()
 {
 	window = new sf::RenderWindow(sf::VideoMode({ 1200, 900 }), "TerraDash");
@@ -66,7 +65,7 @@ void Game::update(const float dt)
 	level.update(dt);
 }
 
-
+//! Doesnt work
 void Game::updateView()
 {
 	float aspect = (float)window->getSize().x / (float)window->getSize().y;
@@ -88,9 +87,9 @@ void Game::render()
 {
 	window->clear();
 	
-	//window->setView(camera);
-	player->draw(*window);
-	level.draw(*window);
+	//player->draw(*window);
+	//level.draw(*window);
+	Level::debugDraw(*window);
 	
 	window->display();
 }
