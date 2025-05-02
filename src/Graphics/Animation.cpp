@@ -55,7 +55,8 @@ void Animation::applyToSprite(sf::Sprite& s) const
 {
 	s.setTexture(*texture);
 	s.setTextureRect(frames[iFrame]);
-	s.setScale({2, 2}); 
+	s.setOrigin({s.getLocalBounds().size.x / 2,s.getLocalBounds().size.y / 2});
+	s.setScale({1,2});
 }
 
 

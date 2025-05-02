@@ -1,16 +1,35 @@
 #include "Player.h"
 
-
-Player::Player()
+Player::Player(sf::Vector2f pos)
 {
     initAnimations();
+    p_visual->setPosition(pos);
+
+    b2BodyDef def{};
+    def.type = b2_dynamicBody;
+    def.position.Set(pos.x, pos.y);
+    
+    body = Level::world.CreateBody(&def);
+    
+    b2PolygonShape shape{};
+    shape.SetAsBox(16.0f, 32.0f);
+    
+    b2FixtureDef fixDef{};
+    fixDef.shape = &shape;
+    fixDef.density = 1.0f;
+    fixDef.friction = 0.3f;
+    body->CreateFixture(&fixDef);
+
+    // set heading to face right by default
+    heading[int(move::RIGHT)] = true;
+    heading[int(move::LEFT)] = false;
+    heading[int(move::IN_AIR)] = false;
 
     // Set all movement to false since player is not initially moving
     for(int i = 0; i < int(state::COUNT); i++)
         key_movement[i] = false;
 
-    vel.x = 0.f;
-    vel.y = 0.f;
+    hp = 10;
 }
 
 
@@ -24,127 +43,103 @@ void Player::keyPressed(sf::Keyboard::Scancode key)
 {
     if(key == sf::Keyboard::Scan::Right)
     {
-        // Right key press detected, player is no longer idle
+        heading[int(move::RIGHT)] = true;
+        heading[int(move::LEFT)] = false;
         key_movement[int(state::IDLE_RIGHT)] = false;
-
-        // Player not running or jumping, must be walking right
-        if(!key_movement[int(state::RUN_RIGHT)] && !key_movement[int(state::JUMP_RIGHT)])
+        
+        if(heading[int(move::IN_AIR)])
+        {
+            key_movement[int(state::JUMP_RIGHT)] = true;
+            curr_animation = state::JUMP_RIGHT;
+        }
+        else
         {
             key_movement[int(state::WALK_RIGHT)] = true;
             curr_animation = state::WALK_RIGHT;
         }
-        // Player not walking or jumping, must be running right
-        else if(!key_movement[int(state::WALK_RIGHT)] && !key_movement[int(state::JUMP_RIGHT)])
-        {
-            key_movement[int(state::RUN_RIGHT)] = true;
-            curr_animation = state::WALK_RIGHT;
-        }
-        // player not walking or running, must be jumping
-        else if(!key_movement[int(state::WALK_RIGHT)] && !key_movement[int(state::RUN_RIGHT)])
-        {
-            key_movement[int(state::JUMP_RIGHT)] = true;
-            curr_animation = state::WALK_RIGHT;
-        }
     }
-    if(key == sf::Keyboard::Scan::Left)
+    else if(key == sf::Keyboard::Scan::Left)
     {
-        // Left key press detected, player is no longer idle
+        heading[int(move::LEFT)] = true;
+        heading[int(move::RIGHT)] = false;
         key_movement[int(state::IDLE_LEFT)] = false;
 
-        // Player not running or jumping, must be walking right
-        if(!key_movement[int(state::RUN_LEFT)] && !key_movement[int(state::JUMP_LEFT)])
+        if(heading[int(move::IN_AIR)])
+        {
+            key_movement[int(state::JUMP_LEFT)] = true;
+            curr_animation = state::JUMP_LEFT;
+        }
+        else
         {
             key_movement[int(state::WALK_LEFT)] = true;
             curr_animation = state::WALK_LEFT;
         }
-        // Player not walking or jumping, must be running right
-        else if(!key_movement[int(state::WALK_LEFT)] && !key_movement[int(state::JUMP_LEFT)])
-        {
-            key_movement[int(state::RUN_LEFT)] = true;
-            curr_animation = state::WALK_LEFT;
-        }
-        // player not walking or running, must be jumping
-        else if(!key_movement[int(state::WALK_LEFT)] && !key_movement[int(state::RUN_LEFT)])
-        {
-            key_movement[int(state::JUMP_LEFT)] = true;
-            curr_animation = state::WALK_LEFT;
-        }
     }
-    if(key == sf::Keyboard::Scan::Space)
+    else if(key == sf::Keyboard::Scan::Space || key == sf::Keyboard::Scan::Up)
     {
-        if(key_movement[int(state::IDLE_RIGHT)])
+        heading[int(move::IN_AIR)] = true;
+
+        if(heading[int(move::RIGHT)])
         {
-            key_movement[int(state::IDLE_RIGHT)] = false;
             key_movement[int(state::JUMP_RIGHT)] = true;
             curr_animation = state::JUMP_RIGHT;
         }
+        else
+        {
+            key_movement[int(state::JUMP_LEFT)] = true;
+            curr_animation = state::JUMP_LEFT;
+        }
+    }
+    else if(key == sf::Keyboard::Scan::Z)
+    {
+
     }
 }
 
 
 void Player::keyReleased(sf::Keyboard::Scancode key)
 {
-
     if(key == sf::Keyboard::Scan::Right)
     {
-        // Right key release detected, player is idle
-        key_movement[int(state::IDLE_RIGHT)] = true;
-        
-        // Player is not moving at right if right key is released
-        key_movement[int(state::WALK_RIGHT)] = false;
-        key_movement[int(state::RUN_RIGHT)] = false;
-        key_movement[int(state::JUMP_RIGHT)] = false;
-
         curr_animation = state::IDLE_RIGHT;
     }
-    
-    if(key == sf::Keyboard::Scan::Left)
+    else if(key == sf::Keyboard::Scan::Left)
     {
-        // Left key release detected, player is idle
-        key_movement[int(state::IDLE_LEFT)] = true;
-
-        // Player is not moving at left if left key is released
-        key_movement[int(state::WALK_LEFT)] = false;
-        key_movement[int(state::RUN_LEFT)] = false;
-        key_movement[int(state::JUMP_LEFT)] = false;
-
         curr_animation = state::IDLE_LEFT;
     }
-    
-    if(key == sf::Keyboard::Scan::Space)
+    else if(key == sf::Keyboard::Scan::Space || key == sf::Keyboard::Scan::Up)
     {
-        if(key_movement[int(state::IDLE_RIGHT)])
-        {
-            key_movement[int(state::IDLE_RIGHT)] = true;
-            key_movement[int(state::JUMP_RIGHT)] = false;
+        heading[int(move::IN_AIR)] = false;
+
+        if(heading[int(move::RIGHT)])
             curr_animation = state::IDLE_RIGHT;
-        }
+        else 
+            curr_animation = state::IDLE_LEFT;
+    }
+    else if(key == sf::Keyboard::Scan::Z)
+    {
+
     }
 }
 
 
 void Player::update(const float& dt)
 {
+    p_visual->setPosition(sf::Vector2f({body->GetPosition().x, body->GetPosition().y}));
     p_animations[int(curr_animation)].update(dt);
     p_animations[int(curr_animation)].applyToSprite(*p_visual);
 }
 
 
 void Player::draw(sf::RenderWindow& window) const
-{
+{    
     window.draw(*p_visual);
-}
-
-
-void Player::setPos(sf::Vector2f pos)
-{
-    p_visual->setPosition(pos);
 }
 
 
 void Player::initAnimations()
 {
-    sf::Texture* t = &Resources::get(textures::Blue);
+    sf::Texture* t = &Resources::get(textures::White);
     p_visual = new sf::Sprite(*t);
 
     sf::Vector2i size({32, 32});

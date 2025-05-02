@@ -27,7 +27,7 @@ class Game
 
         // Game Elements
         Resources gameTextures;
-        Player player;
+        Player* player;
         Level level;
 };
 
