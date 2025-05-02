@@ -2,7 +2,6 @@
 
 Player::Player(sf::Vector2f pos)
 {
-    std::cout << "Position from image file: (" << pos.x << ", " << pos.y << ")\n";
     initAnimations();
     p_visual->setPosition(pos);
 
@@ -13,7 +12,7 @@ Player::Player(sf::Vector2f pos)
     body = Level::world.CreateBody(&def);
     
     b2PolygonShape shape{};
-    shape.SetAsBox(p_visual->getGlobalBounds().size.x, p_visual->getGlobalBounds().size.y);
+    shape.SetAsBox(16.0f, 32.0f);
     
     b2FixtureDef fixDef{};
     fixDef.shape = &shape;
@@ -133,17 +132,8 @@ void Player::update(const float& dt)
 
 
 void Player::draw(sf::RenderWindow& window) const
-{
-    /*
-    sf::RectangleShape s(sf::Vector2f({32.0f, 32.0f}));
-    s.setPosition(sf::Vector2f({body->GetPosition().x, body->GetPosition().y}));
-    s.setFillColor(sf::Color::Transparent);
-    s.setOutlineThickness(1);
-    s.setOutlineColor(sf::Color::Red);
-    */
-    
+{    
     window.draw(*p_visual);
-    //window.draw(s);
 }
 
 

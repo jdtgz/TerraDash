@@ -28,6 +28,7 @@ class Level
         static Debug* world_debugger;
     private:
         std::vector<std::vector<int>> grid;
+        std::vector<b2Body*> tiles;
         const int BLOCK_SIZE = 32.0f; 
 
 };

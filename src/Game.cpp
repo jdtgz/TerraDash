@@ -85,11 +85,14 @@ void Game::updateView()
 
 void Game::render()
 {
+	bool debug = false;
 	window->clear();
 	
-	//player->draw(*window);
-	//level.draw(*window);
-	Level::debugDraw(*window);
+	player->draw(*window);
+	level.draw(*window);
+	
+	if(debug)
+		Level::debugDraw(*window);
 	
 	window->display();
 }
