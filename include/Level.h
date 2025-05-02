@@ -6,7 +6,7 @@
 #include <box2d/b2_polygon_shape.h>
 #include <box2d/b2_draw.h>
 #include <vector>
-#include "../Graphics/Resources.h"
+#include "Resources.h"
 
 
 class Debug;

@@ -1,10 +1,10 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
-#include "Game Elements/Level.h"
-#include "Game Elements/Player.h"
-#include "Graphics/Animation.h"
-#include "Graphics/Resources.h"
+#include "Level.h"
+#include "Player.h"
+#include "Animation.h"
+#include "Resources.h"
 
 
 class Game
