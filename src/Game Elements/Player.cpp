@@ -1,5 +1,7 @@
 #include "Player.h"
 
+constexpr float SCALE = 30.f; 
+
 Player::Player(sf::Vector2f pos)
 {
     initAnimations();
@@ -7,27 +9,24 @@ Player::Player(sf::Vector2f pos)
 
     b2BodyDef def{};
     def.type = b2_dynamicBody;
-    def.position.Set(pos.x, pos.y);
+    def.position.Set(pos.x / SCALE, pos.y / SCALE);
     
-    body = Level::world.CreateBody(&def);
+    p_body = Level::world.CreateBody(&def);
     
     b2PolygonShape shape{};
-    shape.SetAsBox(16.0f, 32.0f);
+    shape.SetAsBox(16.0f / SCALE, 32.0f / SCALE);
     
     b2FixtureDef fixDef{};
     fixDef.shape = &shape;
     fixDef.density = 1.0f;
     fixDef.friction = 0.3f;
-    body->CreateFixture(&fixDef);
+    p_body->CreateFixture(&fixDef);
 
-    // set heading to face right by default
-    heading[int(move::RIGHT)] = true;
-    heading[int(move::LEFT)] = false;
-    heading[int(move::IN_AIR)] = false;
+    p_body->SetFixedRotation(true);
+    p_body->SetLinearDamping(1.0f);
 
-    // Set all movement to false since player is not initially moving
-    for(int i = 0; i < int(state::COUNT); i++)
-        key_movement[i] = false;
+    for(int i = 0; i < int(move::COUNT); i++)
+        heading[i] = false;
 
     hp = 10;
 }
@@ -43,57 +42,17 @@ void Player::keyPressed(sf::Keyboard::Scancode key)
 {
     if(key == sf::Keyboard::Scan::Right)
     {
-        heading[int(move::RIGHT)] = true;
-        heading[int(move::LEFT)] = false;
-        key_movement[int(state::IDLE_RIGHT)] = false;
-        
-        if(heading[int(move::IN_AIR)])
-        {
-            key_movement[int(state::JUMP_RIGHT)] = true;
-            curr_animation = state::JUMP_RIGHT;
-        }
-        else
-        {
-            key_movement[int(state::WALK_RIGHT)] = true;
-            curr_animation = state::WALK_RIGHT;
-        }
+       heading[int(move::RIGHT)] = true;
     }
-    else if(key == sf::Keyboard::Scan::Left)
+    if(key == sf::Keyboard::Scan::Left)
     {
         heading[int(move::LEFT)] = true;
-        heading[int(move::RIGHT)] = false;
-        key_movement[int(state::IDLE_LEFT)] = false;
-
-        if(heading[int(move::IN_AIR)])
-        {
-            key_movement[int(state::JUMP_LEFT)] = true;
-            curr_animation = state::JUMP_LEFT;
-        }
-        else
-        {
-            key_movement[int(state::WALK_LEFT)] = true;
-            curr_animation = state::WALK_LEFT;
-        }
     }
-    else if(key == sf::Keyboard::Scan::Space || key == sf::Keyboard::Scan::Up)
+    if(key == sf::Keyboard::Scan::Up)
     {
         heading[int(move::IN_AIR)] = true;
-
-        if(heading[int(move::RIGHT)])
-        {
-            key_movement[int(state::JUMP_RIGHT)] = true;
-            curr_animation = state::JUMP_RIGHT;
-        }
-        else
-        {
-            key_movement[int(state::JUMP_LEFT)] = true;
-            curr_animation = state::JUMP_LEFT;
-        }
     }
-    else if(key == sf::Keyboard::Scan::Z)
-    {
-
-    }
+    
 }
 
 
@@ -101,31 +60,36 @@ void Player::keyReleased(sf::Keyboard::Scancode key)
 {
     if(key == sf::Keyboard::Scan::Right)
     {
-        curr_animation = state::IDLE_RIGHT;
+        heading[int(move::RIGHT)] = false;
     }
-    else if(key == sf::Keyboard::Scan::Left)
+    if(key == sf::Keyboard::Scan::Left)
     {
-        curr_animation = state::IDLE_LEFT;
+        heading[int(move::LEFT)] = false;
     }
-    else if(key == sf::Keyboard::Scan::Space || key == sf::Keyboard::Scan::Up)
+    if(key == sf::Keyboard::Scan::Up)
     {
         heading[int(move::IN_AIR)] = false;
-
-        if(heading[int(move::RIGHT)])
-            curr_animation = state::IDLE_RIGHT;
-        else 
-            curr_animation = state::IDLE_LEFT;
-    }
-    else if(key == sf::Keyboard::Scan::Z)
-    {
-
     }
 }
 
 
 void Player::update(const float& dt)
 {
-    p_visual->setPosition(sf::Vector2f({body->GetPosition().x, body->GetPosition().y}));
+    // Update the movement of player
+    b2Vec2 force (0.0f, 0.0f);
+    if(heading[int(move::RIGHT)])
+        force.x += 70.f;
+    if(heading[int(move::LEFT)])
+        force.x -= 70.f;
+    if(heading[int(move::IN_AIR)])
+        force.y -= 100.f;
+
+    p_body->ApplyForceToCenter(force, true);
+
+    b2Vec2 nPos = p_body->GetPosition();
+    p_visual->setPosition(sf::Vector2f({nPos.x * SCALE, nPos.y * SCALE}));
+    
+    // Update animation visuals
     p_animations[int(curr_animation)].update(dt);
     p_animations[int(curr_animation)].applyToSprite(*p_visual);
 }
@@ -139,7 +103,8 @@ void Player::draw(sf::RenderWindow& window) const
 
 sf::Vector2f Player::getPosition() const
 {
-    return p_visual->getPosition();
+    b2Vec2 cPos = p_body->GetPosition();
+    return sf::Vector2f({cPos.x * SCALE, cPos.y * SCALE});
 }
 
 

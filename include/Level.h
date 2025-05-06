@@ -11,6 +11,7 @@
 
 class Debug;
 
+
 class Level
 {
     public:

@@ -3,6 +3,7 @@
 b2World Level::world { b2Vec2(0.0f, 9.8f) };
 Debug* Level::world_debugger{};
 
+constexpr float SCALE = 30.f; 
 
 class Debug : public b2Draw
 {
@@ -11,15 +12,17 @@ class Debug : public b2Draw
         {
         }
 
+
         virtual void DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color)
         {
             sf::ConvexShape shape(vertexCount);
             for(int i = 0; i < vertexCount; i++)
-                shape.setPoint(i, sf::Vector2f({vertices[i].x, vertices[i].y}));
+                shape.setPoint(i, sf::Vector2f({vertices[i].x * SCALE, vertices[i].y * SCALE}));
             
-            shape.setOutlineThickness(0.02f);
+            shape.setOutlineThickness(0.5f);
             shape.setFillColor(sf::Color::Transparent);
             shape.setOutlineColor(sf::Color(color.r * 255, color.g * 255, color.b * 255, color.a * 255));
+            
             target.draw(shape);
         }
 
@@ -28,34 +31,39 @@ class Debug : public b2Draw
         {
             sf::ConvexShape shape(vertexCount);
             for(int i = 0; i < vertexCount; i++)
-                shape.setPoint(i, sf::Vector2f({vertices[i].x, vertices[i].y}));
+                shape.setPoint(i, sf::Vector2f({vertices[i].x * SCALE, vertices[i].y * SCALE}));
             
-            shape.setFillColor(sf::Color(color.r * 255, color.g * 255, color.b * 255, color.a * 80));
+            shape.setFillColor(sf::Color(color.r * 255, color.g * 255, color.b * 255, color.a * 255));
+            
             target.draw(shape);
         }
 
-        /// Draw a circle.
+
         virtual void DrawCircle(const b2Vec2& center, float radius, const b2Color& color)
         {
-            sf::CircleShape circle(radius);
-            circle.setPosition({center.x, center.y});
-            circle.setOrigin({radius / 2.0f, radius / 2.0f});
-            circle.setOutlineThickness(0.02f);
+            sf::CircleShape circle(radius * SCALE);
+            circle.setPosition({center.x * SCALE, center.y * SCALE});
+            circle.setOrigin({radius * SCALE, radius * SCALE});
+
+            circle.setOutlineThickness(0.5f);
             circle.setFillColor(sf::Color::Transparent);
             circle.setOutlineColor(sf::Color(color.r * 255, color.g * 255, color.b * 255, color.a * 255));
+
             target.draw(circle);
         }
 
-        /// Draw a solid circle.
+
         virtual void DrawSolidCircle(const b2Vec2& center, float radius, const b2Vec2& axis, const b2Color& color)
         {
-            sf::CircleShape circle(radius);
-            circle.setPosition({center.x, center.y});
-            circle.setOrigin({radius / 2.0f, radius / 2.0f});
+            sf::CircleShape circle(radius * SCALE);
+            circle.setPosition({center.x * SCALE, center.y * SCALE});
+            circle.setOrigin({radius * SCALE, radius * SCALE});
+
             circle.setFillColor(sf::Color(color.r * 255, color.g * 255, color.b * 255, color.a * 80));
+            
             target.draw(circle);
 
-            b2Vec2 p = center + (radius * axis);
+            b2Vec2 p = center + radius * axis;
             DrawSegment(center, p, color);
         }
 
@@ -65,10 +73,10 @@ class Debug : public b2Draw
             sf::VertexArray va(sf::PrimitiveType::Lines, 2);
             sf::Color sfColor(sf::Color(color.r * 255, color.g * 255, color.b * 255, color.a * 255));
 
-            va[0].position = sf::Vector2f({p1.x, p1.y});
+            va[0].position = sf::Vector2f({p1.x * SCALE, p1.y * SCALE});
             va[0].color = sfColor;
 
-            va[1].position = sf::Vector2f({p2.x, p2.y});
+            va[1].position = sf::Vector2f({p2.x * SCALE, p2.y * SCALE});
             va[1].color = sfColor;
 
             target.draw(va);
@@ -89,9 +97,10 @@ class Debug : public b2Draw
         virtual void DrawPoint(const b2Vec2& p, float size, const b2Color& color)
         {
             sf::CircleShape circle(size);
-            circle.setPosition({p.x, p.y});
-            circle.setOrigin({size / 2.0f, size / 2.0f});
+            circle.setPosition({p.x * SCALE, p.y * SCALE});
+            circle.setOrigin({size, size});
             circle.setFillColor(sf::Color(color.r * 255, color.g * 255, color.b * 255, color.a * 255));
+
             target.draw(circle);
         }
     private:
@@ -106,7 +115,7 @@ Level::Level()
 
 Level::~Level()
 {
-
+    delete world_debugger;
 }
 
 
@@ -128,23 +137,25 @@ sf::Vector2f Level::createFromImage(const sf::Image &levelImage)
 
                 // Create the body definition
                 b2BodyDef def{};
-                def.position.Set(BLOCK_SIZE * x + (BLOCK_SIZE / 2.0f), 
-                BLOCK_SIZE * y + (BLOCK_SIZE / 2.0f));
+                def.position.Set(
+                    (BLOCK_SIZE * x + BLOCK_SIZE / 2.0f) / SCALE, 
+                    (BLOCK_SIZE * y + BLOCK_SIZE / 2.0f) / SCALE);
 
                 // Create the body using pointers
                 b2Body* body = world.CreateBody(&def);
                 
                 // Create the polygon (square) shape for visuals
                 b2PolygonShape shape{};
-                shape.SetAsBox(BLOCK_SIZE / 2.0f, BLOCK_SIZE / 2.0f);
+                shape.SetAsBox(BLOCK_SIZE / 2.0f / SCALE, BLOCK_SIZE / 2.0f / SCALE);
                 body->CreateFixture(&shape, 0.0f);
+                
                 tiles.push_back(body);
             }
             if(pixel == sf::Color::Blue)
             {
                 grid[x][y] = 2;
-                playerPos.x = BLOCK_SIZE * x + (BLOCK_SIZE / 2.0f); 
-                playerPos.y = BLOCK_SIZE * y + (BLOCK_SIZE / 2.0f);
+                playerPos.x = BLOCK_SIZE * x + BLOCK_SIZE / 2.0f; 
+                playerPos.y = BLOCK_SIZE * y + BLOCK_SIZE / 2.0f;
             }
         }
     }
@@ -154,8 +165,7 @@ sf::Vector2f Level::createFromImage(const sf::Image &levelImage)
 
 
 void Level::init()
-{
-    
+{  
 }
 
 
@@ -180,8 +190,12 @@ void Level::draw(sf::RenderWindow &window) const
                     sf::IntRect({32,0},{BLOCK_SIZE, BLOCK_SIZE}));
 
                 block.setOrigin({BLOCK_SIZE / 2.0f,BLOCK_SIZE / 2.0f});
-                block.setPosition(sf::Vector2f({tiles[tile]->GetPosition().x, tiles[tile]->GetPosition().y}));
+                b2Vec2 tmp_pos = tiles[tile]->GetPosition();
+
+                block.setPosition(sf::Vector2f({tmp_pos.x * SCALE, tmp_pos.y * SCALE}));
+                
                 window.draw(block);
+                
                 tile++;
             }
             y++;
@@ -197,7 +211,7 @@ void Level::debugDraw(sf::RenderWindow& window)
     {
         sf::RenderTarget& tmp(window);
         world_debugger = new Debug(tmp);
-        world_debugger->SetFlags(b2Draw::e_shapeBit);
+        world_debugger->SetFlags(b2Draw::e_centerOfMassBit);
         world.SetDebugDraw(world_debugger);
     }
 

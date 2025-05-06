@@ -87,8 +87,7 @@ void Game::render()
 	player->draw(*window);
 	level.draw(*window);
 	
-	if(false)
-		Level::debugDraw(*window);
+	Level::debugDraw(*window);
 
 	window->setView(camera);
 	

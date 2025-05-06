@@ -68,7 +68,7 @@ class Player
         bool heading[move::COUNT];
         bool key_movement[state::COUNT];
 
-        b2Body* body;
+        b2Body* p_body;
         
         // Player attributes
         int hp;
