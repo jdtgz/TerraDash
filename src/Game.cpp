@@ -5,11 +5,17 @@ Game::Game()
 	window = new sf::RenderWindow(sf::VideoMode({ 1200, 900 }), "TerraDash");
 	window->setFramerateLimit(144);
 
-	level.init();
-	
+	// Init world and player 
 	sf::Image lvl;
-	lvl.loadFromFile("Textures/Worlds/world1.png");
+	if(!lvl.loadFromFile("Textures/Worlds/world1.png"))
+		std::cerr << "Could not load image." << std::endl;
+
 	player = new Player(level.createFromImage(lvl));
+
+	// Init camera centered about player
+	camera.setSize(window->getDefaultView().getSize());
+	camera.setCenter(player->getPosition());
+	camera.zoom(0.75f);
 }
 
 
@@ -26,8 +32,6 @@ void Game::run()
 
 	while (window->isOpen())
 	{
-		processEvents();
-
 		// advance clock
 		float deltaTime = clock.restart().asSeconds();
 
@@ -61,38 +65,32 @@ void Game::processEvents()
 
 void Game::update(const float dt)
 {
+	// Game elements 
 	player->update(dt);
 	level.update(dt);
+
+	// Camera
+	updateView();
 }
 
-//! Doesnt work
+
 void Game::updateView()
 {
-	float aspect = (float)window->getSize().x / (float)window->getSize().y;
-
-	sf::Vector2f size;
-	if(aspect < 1.0f)
-	{
-		size = sf::Vector2f(ZOOM, ZOOM / aspect);
-	}
-	else
-	{
-		size = sf::Vector2f(ZOOM * aspect, ZOOM);
-	}
-	camera.setSize(size);
+	camera.setCenter(player->getPosition());
 }
 
 
 void Game::render()
 {
-	bool debug = false;
 	window->clear();
 	
 	player->draw(*window);
 	level.draw(*window);
 	
-	if(debug)
+	if(false)
 		Level::debugDraw(*window);
+
+	window->setView(camera);
 	
 	window->display();
 }

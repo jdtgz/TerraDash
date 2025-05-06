@@ -16,10 +16,19 @@ class Player
         Player(sf::Vector2f p_pos);
         ~Player();
 
+        // Input processing 
         void keyPressed(sf::Keyboard::Scancode key);
         void keyReleased(sf::Keyboard::Scancode key);
+        
+        // Meant for game loop to step player into next state
         void update(const float& dt);
+        
+        // Draws player onto renderwindow for game       
         void draw(sf::RenderWindow& window) const;
+
+        // Access var functions
+        sf::Vector2f getPosition() const;
+
     private:
         // Loads all approprite textures for the player and inits the idle 
         // animation by default and applies it to the sprite obj p_visual

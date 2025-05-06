@@ -137,6 +137,12 @@ void Player::draw(sf::RenderWindow& window) const
 }
 
 
+sf::Vector2f Player::getPosition() const
+{
+    return p_visual->getPosition();
+}
+
+
 void Player::initAnimations()
 {
     sf::Texture* t = &Resources::get(textures::White);

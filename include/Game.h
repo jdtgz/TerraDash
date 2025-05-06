@@ -23,7 +23,6 @@ class Game
         // Window Elements
         sf::RenderWindow* window; 
         sf::View camera;
-        const float ZOOM = 5.0f;
 
         // Game Elements
         Resources gameTextures;
