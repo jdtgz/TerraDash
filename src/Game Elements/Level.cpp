@@ -3,7 +3,7 @@
 b2World Level::world { b2Vec2(0.0f, 9.8f) };
 Debug* Level::world_debugger{};
 
-constexpr float SCALE = 30.f; 
+constexpr float SCALE = 32.f; 
 
 class Debug : public b2Draw
 {
@@ -33,7 +33,7 @@ class Debug : public b2Draw
             for(int i = 0; i < vertexCount; i++)
                 shape.setPoint(i, sf::Vector2f({vertices[i].x * SCALE, vertices[i].y * SCALE}));
             
-            shape.setFillColor(sf::Color(color.r * 255, color.g * 255, color.b * 255, color.a * 255));
+            shape.setFillColor(sf::Color(color.r * 255, color.g * 255, color.b * 255, color.a * 120));
             
             target.draw(shape);
         }
@@ -59,7 +59,7 @@ class Debug : public b2Draw
             circle.setPosition({center.x * SCALE, center.y * SCALE});
             circle.setOrigin({radius * SCALE, radius * SCALE});
 
-            circle.setFillColor(sf::Color(color.r * 255, color.g * 255, color.b * 255, color.a * 80));
+            circle.setFillColor(sf::Color(color.r * 255, color.g * 255, color.b * 255, color.a * 120));
             
             target.draw(circle);
 
@@ -98,13 +98,44 @@ class Debug : public b2Draw
         {
             sf::CircleShape circle(size);
             circle.setPosition({p.x * SCALE, p.y * SCALE});
-            circle.setOrigin({size, size});
+            circle.setOrigin({size * SCALE, size * SCALE});
             circle.setFillColor(sf::Color(color.r * 255, color.g * 255, color.b * 255, color.a * 255));
 
             target.draw(circle);
         }
     private:
         sf::RenderTarget& target;  
+};
+
+
+class GlobalContactListener : public b2ContactListener
+{
+    public:
+        virtual void BeginContact(b2Contact* contact) override
+        {
+            ContactListener* listener = (ContactListener*)contact->GetFixtureA()->GetUserData().pointer;
+
+            if(listener)
+                listener->OnBeginContact();
+
+            listener = (ContactListener*)contact->GetFixtureB()->GetUserData().pointer;
+
+            if(listener)
+                listener->OnBeginContact();
+        }
+
+        virtual void EndContact(b2Contact* contact) override
+        {
+             ContactListener* listener = (ContactListener*)contact->GetFixtureA()->GetUserData().pointer;
+
+            if(listener)
+                listener->OnEndContact();
+
+            listener = (ContactListener*)contact->GetFixtureB()->GetUserData().pointer;
+
+            if(listener)
+                listener->OnEndContact();
+        }
 };
 
 
@@ -169,9 +200,10 @@ void Level::init()
 }
 
 
-void Level::update(float dt)
+void Level::update(float dt, sf::Vector2f pos)
 {
-    world.Step(dt, 6 , 2);
+    world.Step(dt, 6, 2);
+    world.SetContactListener(new GlobalContactListener());
 }
 
 
@@ -211,7 +243,7 @@ void Level::debugDraw(sf::RenderWindow& window)
     {
         sf::RenderTarget& tmp(window);
         world_debugger = new Debug(tmp);
-        world_debugger->SetFlags(b2Draw::e_centerOfMassBit);
+        world_debugger->SetFlags(b2Draw::e_shapeBit);
         world.SetDebugDraw(world_debugger);
     }
 

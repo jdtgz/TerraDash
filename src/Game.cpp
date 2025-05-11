@@ -2,7 +2,7 @@
 
 Game::Game(textures::ID p_id)
 {
-	window = new sf::RenderWindow(sf::VideoMode({ 1200, 900 }), "TerraDash");
+	window = new sf::RenderWindow(sf::VideoMode({ 1920, 1080 }), "TerraDash");
 	window->setFramerateLimit(144);
 
 	// Init world and player 
@@ -65,8 +65,8 @@ void Game::processEvents()
 void Game::update(const float dt)
 {
 	// Game elements 
+	level.update(dt, player->getPosition());
 	player->update(dt);
-	level.update(dt);
 
 	// Camera
 	updateView();
@@ -83,8 +83,8 @@ void Game::render()
 {
 	window->clear();
 	
-	player->draw(*window);
 	level.draw(*window);
+	player->draw(*window);
 	
 	Level::debugDraw(*window);
 

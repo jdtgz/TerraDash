@@ -1,6 +1,9 @@
 #include "Player.h"
 
-constexpr float SCALE = 30.f; 
+constexpr float SCALE = 32.f; 
+
+const float SPEED = 5.0f;
+const float JUMP_HEIGHT = 7.0f;
 
 Player::Player(sf::Vector2f pos,  textures::ID txtID) : p_txt(txtID)
 {
@@ -10,23 +13,31 @@ Player::Player(sf::Vector2f pos,  textures::ID txtID) : p_txt(txtID)
     b2BodyDef def{};
     def.type = b2_dynamicBody;
     def.position.Set(pos.x / SCALE, pos.y / SCALE);
-    
+    def.fixedRotation = true;
     p_body = Level::world.CreateBody(&def);
     
-    b2PolygonShape shape{};
-    shape.SetAsBox(16.0f / SCALE, 32.0f / SCALE);
-    
+    b2PolygonShape polyShape{};
+    polyShape.SetAsBox(15.0f / SCALE, 15.0f / SCALE);
     b2FixtureDef fixDef{};
-    fixDef.shape = &shape;
+    fixDef.shape = &polyShape;
     fixDef.density = 1.0f;
     fixDef.friction = 0.3f;
     p_body->CreateFixture(&fixDef);
 
-    p_body->SetFixedRotation(true);
-    p_body->SetLinearDamping(1.0f);
+    b2CircleShape circleShape{};
+    circleShape.m_radius = 16.0f / SCALE;
+    circleShape.m_p.Set(0.0f, -16.0f / SCALE);
+    fixDef.shape = &circleShape;
+    p_body->CreateFixture(&fixDef);
+
+    circleShape.m_p.Set(0.0f, 16.0f / SCALE);
+    fixDef.userData.pointer = (uintptr_t)this;
+    p_body->CreateFixture(&fixDef);
 
     for(int i = 0; i < int(move::COUNT); i++)
         heading[i] = false;
+    isGrounded = false;
+    sprint = false;
 
     hp = 10;
 }
@@ -44,15 +55,18 @@ void Player::keyPressed(sf::Keyboard::Scancode key)
     {
        heading[int(move::RIGHT)] = true;
     }
-    if(key == sf::Keyboard::Scan::Left)
+    else if(key == sf::Keyboard::Scan::Left)
     {
         heading[int(move::LEFT)] = true;
     }
-    if(key == sf::Keyboard::Scan::Up)
+    else if(key == sf::Keyboard::Scan::Up)
     {
-        heading[int(move::IN_AIR)] = true;
+        heading[int(move::UP)] = true;
     }
-    
+    else if(key == sf::Keyboard::Scan::LShift)
+    {
+        sprint = true;
+    }
 }
 
 
@@ -62,13 +76,17 @@ void Player::keyReleased(sf::Keyboard::Scancode key)
     {
         heading[int(move::RIGHT)] = false;
     }
-    if(key == sf::Keyboard::Scan::Left)
+    else if(key == sf::Keyboard::Scan::Left)
     {
         heading[int(move::LEFT)] = false;
     }
-    if(key == sf::Keyboard::Scan::Up)
+    else if(key == sf::Keyboard::Scan::Up)
     {
-        heading[int(move::IN_AIR)] = false;
+        heading[int(move::UP)] = false;
+    }
+    else if(key == sf::Keyboard::Scan::LShift)
+    {
+        sprint = false;
     }
 }
 
@@ -76,15 +94,16 @@ void Player::keyReleased(sf::Keyboard::Scancode key)
 void Player::update(const float& dt)
 {
     // Update the movement of player
-    b2Vec2 force (0.0f, 0.0f);
+    b2Vec2 vel = p_body->GetLinearVelocity();
+    vel.x = 0.0f;
     if(heading[int(move::RIGHT)])
-        force.x += 70.f;
+        vel.x += (sprint) ? SPEED * 1.5f : SPEED;
     if(heading[int(move::LEFT)])
-        force.x -= 70.f;
-    if(heading[int(move::IN_AIR)])
-        force.y -= 100.f;
+        vel.x -= (sprint) ? SPEED * 1.5f : SPEED;
+    if(heading[int(move::UP)] && isGrounded)
+        vel.y = (sprint) ? -JUMP_HEIGHT * 1.5f : -JUMP_HEIGHT;
 
-    p_body->ApplyForceToCenter(force, true);
+    p_body->SetLinearVelocity(vel);
 
     b2Vec2 nPos = p_body->GetPosition();
     p_visual->setPosition(sf::Vector2f({nPos.x * SCALE, nPos.y * SCALE}));
@@ -105,6 +124,18 @@ sf::Vector2f Player::getPosition() const
 {
     b2Vec2 cPos = p_body->GetPosition();
     return sf::Vector2f({cPos.x * SCALE, cPos.y * SCALE});
+}
+
+
+void Player::OnBeginContact()
+{
+    isGrounded = true;
+}
+
+
+void Player::OnEndContact()
+{
+    isGrounded = false;
 }
 
 
