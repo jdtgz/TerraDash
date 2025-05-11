@@ -2,7 +2,7 @@
 
 constexpr float SCALE = 30.f; 
 
-Player::Player(sf::Vector2f pos)
+Player::Player(sf::Vector2f pos,  textures::ID txtID) : p_txt(txtID)
 {
     initAnimations();
     p_visual->setPosition(pos);
@@ -110,7 +110,7 @@ sf::Vector2f Player::getPosition() const
 
 void Player::initAnimations()
 {
-    sf::Texture* t = &Resources::get(textures::White);
+    sf::Texture* t = &Resources::get(p_txt);
     p_visual = new sf::Sprite(*t);
 
     sf::Vector2i size({32, 32});

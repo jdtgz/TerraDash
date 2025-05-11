@@ -15,7 +15,9 @@ class Animation
 		
 		void setUp(sf::Texture& t, sf::Vector2i pos, sf::Vector2i size, const int& tFrames);
 
-		void applyToSprite(sf::Sprite&) const; 
+		void applyToSprite(sf::Sprite& s); 
+
+		void applyToSprite(sf::Sprite& s, int x, int y); 
 
 		void update(const float& dt); 
 

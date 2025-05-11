@@ -51,12 +51,22 @@ void Animation::setUp(sf::Texture& t, sf::Vector2i pos, sf::Vector2i size, const
 
 
 // applies the right textureRect to the animation and scales it
-void Animation::applyToSprite(sf::Sprite& s) const
+void Animation::applyToSprite(sf::Sprite& s)
 {
 	s.setTexture(*texture);
 	s.setTextureRect(frames[iFrame]);
 	s.setOrigin({s.getLocalBounds().size.x / 2,s.getLocalBounds().size.y / 2});
-	s.setScale({1,2});
+	s.setScale({1, 2});
+}
+
+
+// applies the right textureRect to the animation and scales it by {x ,y}
+void Animation::applyToSprite(sf::Sprite& s, int x, int y)
+{
+	s.setTexture(*texture);
+	s.setTextureRect(frames[iFrame]);
+	s.setOrigin({s.getLocalBounds().size.x / 2,s.getLocalBounds().size.y / 2});
+	s.setScale({float(x), float(y)});
 }
 
 

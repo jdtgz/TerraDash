@@ -10,7 +10,7 @@
 class Game
 {
     public:
-        Game();
+        Game(textures::ID p_id);
         ~Game();
 
         void run();
@@ -25,7 +25,6 @@ class Game
         sf::View camera;
 
         // Game Elements
-        Resources gameTextures;
         Player* player;
         Level level;
 };

@@ -13,7 +13,7 @@
 class Player
 {
     public:
-        Player(sf::Vector2f p_pos);
+        Player(sf::Vector2f p_pos, textures::ID txtID);
         ~Player();
 
         // Input processing 
@@ -53,6 +53,7 @@ class Player
         };
         
         // Handles all visual aspects of the player 
+        textures::ID p_txt;
         sf::Sprite* p_visual;
         Animation p_animations[int(state::COUNT)];
         state curr_animation;

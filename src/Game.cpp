@@ -1,6 +1,6 @@
 #include "Game.h"
 
-Game::Game()
+Game::Game(textures::ID p_id)
 {
 	window = new sf::RenderWindow(sf::VideoMode({ 1200, 900 }), "TerraDash");
 	window->setFramerateLimit(144);
@@ -10,7 +10,7 @@ Game::Game()
 	if(!lvl.loadFromFile("Textures/Worlds/world1.png"))
 		std::cerr << "Could not load image." << std::endl;
 
-	player = new Player(level.createFromImage(lvl));
+	player = new Player(level.createFromImage(lvl), p_id);
 
 	// Init camera centered about player
 	camera.setSize(window->getDefaultView().getSize());
@@ -46,7 +46,6 @@ void Game::processEvents()
 {
 	while (const std::optional event = window->pollEvent())
 	{
-		
 		if (event->is<sf::Event::Closed>())
 		{
 			window->close();
