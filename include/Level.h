@@ -40,8 +40,10 @@ class Level
 
         static b2World world;
         static Debug* world_debugger;
+        bool playerReachedGoal(const sf::Vector2f& playerPos) const;
     private:
         std::vector<std::vector<int>> grid;
         std::vector<b2Body*> tiles;
         const int BLOCK_SIZE = 32.0f; 
+        sf::Vector2f goalPos;
 };

@@ -6,26 +6,49 @@
 #include "Animation.h"
 #include "Resources.h"
 
+enum class GameState {
+    MENU,
+    PLAYING,
+    GAME_OVER,
+    WIN,
+    EXIT
+};
 
 class Game
 {
-    public:
-        Game(textures::ID p_id);
-        ~Game();
+public:
+    Game(textures::ID p_id);
+    ~Game();
 
-        void run();
-    private:
-        void processEvents();
-        void update(const float dt);
-        void updateView();
-        void render();
+    void run();
+    GameState getState() const { return state; }
 
-        // Window Elements
-        sf::RenderWindow* window; 
-        sf::View camera;
+private:
+    void processEvents();
+    void update(const float dt);
+    void updatePlaying(const float dt);
+    void updateView();
+    void render();
 
-        // Game Elements
-        Player* player;
-        Level level;
+    void drawOverlay(const sf::Text& text);
+    void checkGameConditions();
+
+    // Window Elements
+    sf::RenderWindow* window;
+    sf::View camera;
+
+    // Game Elements
+    Player* player;
+    Level level;
+
+    // Game State
+    GameState state;
+
+    // Timer and Score
+    int score;
+    sf::Clock timer;
+    sf::Font *font;
+    sf::Text *scoreText;
+    sf::Text *gameOverText;
+    sf::Text *winText;
 };
-
