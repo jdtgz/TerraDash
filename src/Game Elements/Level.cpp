@@ -244,26 +244,40 @@ sf::Vector2f Level::createFromImage(const sf::Image &levelImage)
             }
             else
             {
-                if (pixel == sf::Color::Blue)
-                {
-                    grid[x][y] = 19;
-                    playerPos.x = BLOCK_SIZE * x + BLOCK_SIZE / 2.0f; 
-                    playerPos.y = BLOCK_SIZE * y + BLOCK_SIZE / 2.0f;
-                }
-                if (pixel == sf::Color({0, 0, 150, 255}))
-                {
-                    grid[x][y] = 21;
-                    createBody(x,y);
-                }
                 if (pixel == sf::Color::Green)
                 {
                     grid[x][y] = 17;
                     createBody(x, y);
                 }
-                if (pixel == sf::Color::Magenta)
+                if (pixel == sf::Color({0, 0, 150, 255}))
                 {
                     grid[x][y] = 18;
-                    createBody(x, y);
+                    
+                    b2BodyDef def{};
+                    def.position.Set(
+                        (BLOCK_SIZE * x + BLOCK_SIZE / 2.0f) / SCALE, 
+                        (BLOCK_SIZE * y + BLOCK_SIZE / 2.0f) / SCALE);
+
+                    // Create the body using pointers
+                    b2Body* body = world.CreateBody(&def);
+                    
+                    // Create the polygon (square) shape for visuals
+                    b2PolygonShape shape{};
+                    shape.SetAsBox(BLOCK_SIZE / 2.0f / SCALE, BLOCK_SIZE / 2.0f / SCALE);
+                    
+                    b2FixtureDef fixDef{};
+                    fixDef.shape = &shape;
+                    fixDef.isSensor = true;
+                    fixDef.userData.pointer = reinterpret_cast<uintptr_t>(&DEADLY_TAG_INSTANCE);
+                    
+                    body->CreateFixture(&fixDef);
+                    tiles.push_back(body);
+                }
+                if (pixel == sf::Color::Blue)
+                {
+                    grid[x][y] = 19;
+                    playerPos.x = BLOCK_SIZE * x + BLOCK_SIZE / 2.0f; 
+                    playerPos.y = BLOCK_SIZE * y + BLOCK_SIZE / 2.0f;
                 }
             }
         }
@@ -395,8 +409,8 @@ void Level::draw(sf::RenderWindow &window) const
             }
             if (cell == 18)
             {
-                sf::Sprite deathStone(Resources::get(textures::LevelTiles), 
-                    sf::IntRect({0, 384}, {BLOCK_SIZE, BLOCK_SIZE}));
+                sf::Sprite deathStone(Resources::get(textures::WaterTiles), 
+                    sf::IntRect({96, 16}, {BLOCK_SIZE, BLOCK_SIZE}));
 
                 deathStone.setOrigin({BLOCK_SIZE / 2.0f,BLOCK_SIZE / 2.0f});
                 deathStone.setPosition(sf::Vector2f({tiles[tile]->GetPosition().x * SCALE, 
@@ -404,18 +418,6 @@ void Level::draw(sf::RenderWindow &window) const
                 tile++;
 
                 window.draw(deathStone);
-            }
-            if (cell == 21)
-            {
-                sf::Sprite block(Resources::get(textures::WaterTiles), 
-                    sf::IntRect({0, 0},{BLOCK_SIZE, BLOCK_SIZE}));
-
-                block.setOrigin({BLOCK_SIZE / 2.0f,BLOCK_SIZE / 2.0f});
-                block.setPosition(sf::Vector2f({tiles[tile]->GetPosition().x * SCALE, 
-                    tiles[tile]->GetPosition().y * SCALE}));
-                tile++;
-                
-                window.draw(block);
             }
             y++;
         }
