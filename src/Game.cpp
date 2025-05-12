@@ -90,6 +90,7 @@ void Game::processEvents()
 					keyPressed->scancode == sf::Keyboard::Scancode::Enter)
 			{
 				state = GameState::EXIT;
+				db->uploadRun(1, 1, score, static_cast<int>(timer.getElapsedTime().asSeconds()));
 				window->close();
 			}
 		}
@@ -153,8 +154,6 @@ void Game::render()
 		
 		window->setView(window->getDefaultView());
 		window->draw(gameWinScreen);
-	
-		db->uploadRun(1, 1, score, static_cast<int>(timer.getElapsedTime().asSeconds()));
 	}
 
 	window->display();
@@ -178,7 +177,6 @@ void Game::checkGameConditions()
 		return; // Prevents Game Over from overriding it
 	}
 	
-
 	// Game over due to health or deadly block
 	if (state == GameState::PLAYING &&
 		 Level::playerHitDeadly)

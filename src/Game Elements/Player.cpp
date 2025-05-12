@@ -232,7 +232,7 @@ void Player::initPhysicalBody(sf::Vector2f pos)
     fixDef.shape = &polyShape;
     p_body->CreateFixture(&fixDef);
     
-    polyShape.SetAsBox((size.x - 4.0f) / SCALE, (size.y * 0.2f) / SCALE, b2Vec2(0.0f, 1.0f), 0.0f);
+    polyShape.SetAsBox((size.x - 4.0f) / SCALE, (size.y * 0.25f) / SCALE, b2Vec2(0.0f, 1.0f), 0.0f);
     fixDef.userData.pointer = reinterpret_cast<uintptr_t>(this); 
     fixDef.isSensor = true;
     p_body->CreateFixture(&fixDef);
