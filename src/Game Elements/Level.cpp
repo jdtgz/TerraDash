@@ -3,7 +3,9 @@
 b2World Level::world { b2Vec2(0.0f, 9.8f) };
 Debug* Level::world_debugger{};
 
-constexpr float SCALE = 32.f; 
+constexpr float SCALE = 32.f;
+struct DeadlyTag {};
+static DeadlyTag DEADLY_TAG_INSTANCE; 
 
 class Debug : public b2Draw
 {
@@ -113,15 +115,28 @@ class GlobalContactListener : public b2ContactListener
     public:
         virtual void BeginContact(b2Contact* contact) override
         {
-            ContactListener* listener = (ContactListener*)contact->GetFixtureA()->GetUserData().pointer;
+             auto fixtureA = contact->GetFixtureA();
+            auto fixtureB = contact->GetFixtureB();
 
-            if(listener)
-                listener->OnBeginContact();
+            uintptr_t tagA = fixtureA->GetUserData().pointer;
+            uintptr_t tagB = fixtureB->GetUserData().pointer;
 
-            listener = (ContactListener*)contact->GetFixtureB()->GetUserData().pointer;
+            if (tagA == reinterpret_cast<uintptr_t>(&DEADLY_TAG_INSTANCE))
+                Level::playerHitDeadly = true;
 
-            if(listener)
-                listener->OnBeginContact();
+            if (tagB == reinterpret_cast<uintptr_t>(&DEADLY_TAG_INSTANCE))
+                Level::playerHitDeadly = true;
+
+            // only treat as ContactListener* if it's not the deadly tag
+            if (tagA != reinterpret_cast<uintptr_t>(&DEADLY_TAG_INSTANCE)) {
+                if (auto* listenerA = reinterpret_cast<ContactListener*>(tagA))
+                    listenerA->OnBeginContact();
+            }
+
+            if (tagB != reinterpret_cast<uintptr_t>(&DEADLY_TAG_INSTANCE)) {
+                if (auto* listenerB = reinterpret_cast<ContactListener*>(tagB))
+                    listenerB->OnBeginContact();
+            }
         }
 
         virtual void EndContact(b2Contact* contact) override
@@ -212,24 +227,23 @@ sf::Vector2f Level::createFromImage(const sf::Image &levelImage)
             }
             if (pixel == sf::Color::Magenta)
             {
-                 grid[x][y] = 11;
-                 death = sf::Vector2f(BLOCK_SIZE * x + BLOCK_SIZE / 2.0f,
-                                    BLOCK_SIZE * y + BLOCK_SIZE / 2.0f);
+                grid[x][y] = 11;
+    
+                b2BodyDef death{};
+                death.position.Set((BLOCK_SIZE * x + BLOCK_SIZE / 2.0f) / SCALE,
+                                (BLOCK_SIZE * y + BLOCK_SIZE / 2.0f) / SCALE);
 
-                // Create the body definition
-                b2BodyDef def{};
-                def.position.Set(
-                    (BLOCK_SIZE * x + BLOCK_SIZE / 2.0f) / SCALE, 
-                    (BLOCK_SIZE * y + BLOCK_SIZE / 2.0f) / SCALE);
+                b2Body* body = world.CreateBody(&death);
 
-                // Create the body using pointers
-                b2Body* body = world.CreateBody(&def);
-                
-                // Create the polygon (square) shape for visuals
                 b2PolygonShape shape{};
                 shape.SetAsBox(BLOCK_SIZE / 2.0f / SCALE, BLOCK_SIZE / 2.0f / SCALE);
-                body->CreateFixture(&shape, 0.0f);
-                
+
+                b2FixtureDef fixDef{};
+                fixDef.shape = &shape;
+                fixDef.isSensor = true;
+                fixDef.userData.pointer = reinterpret_cast<uintptr_t>(&DEADLY_TAG_INSTANCE); 
+
+                body->CreateFixture(&fixDef);
                 tiles.push_back(body);
             }
         }

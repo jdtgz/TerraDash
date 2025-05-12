@@ -41,6 +41,9 @@ class Level
         static b2World world;
         static Debug* world_debugger;
         bool playerReachedGoal(const sf::Vector2f& playerPos) const;
+        static inline bool playerHitDeadly = false;
+        
+
     private:
         std::vector<std::vector<int>> grid;
         std::vector<b2Body*> tiles;

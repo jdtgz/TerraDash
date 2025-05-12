@@ -151,9 +151,19 @@ void Game::drawOverlay(const sf::Text& text)
 
 void Game::checkGameConditions()
 {
-	if (player->getHealth() <= 0)
-		state = GameState::GAME_OVER;
-
-	if (level.playerReachedGoal(player->getPosition()))
+	// Win check happens first — reaching goal wins immediately
+	if (state == GameState::PLAYING && level.playerReachedGoal(player->getPosition()))
+	{
 		state = GameState::WIN;
+		return; // Prevents Game Over from overriding it
+	}
+
+	// Game over due to health or deadly block
+	if (state == GameState::PLAYING &&
+		(player->getHealth() <= 0 || Level::playerHitDeadly))
+	{
+		state = GameState::GAME_OVER;
+	}
+
+	Level::playerHitDeadly = false;
 }
