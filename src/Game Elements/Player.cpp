@@ -80,7 +80,7 @@ void Player::update(const float& dt)
 
     if(heading[int(move::RIGHT)])
     {
-        if(heading[int(move::RUN)] && isGrounded == 0)
+        if(heading[int(move::RUN)])
         {
             vel.x += SPEED * 2.0f;
             curr_animation = (isGrounded) ? state::RUN_RIGHT : state::JUMP_RIGHT;
