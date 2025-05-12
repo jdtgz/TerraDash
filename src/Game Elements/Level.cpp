@@ -235,6 +235,11 @@ sf::Vector2f Level::createFromImage(const sf::Image &levelImage)
                     playerPos.x = BLOCK_SIZE * x + BLOCK_SIZE / 2.0f; 
                     playerPos.y = BLOCK_SIZE * y + BLOCK_SIZE / 2.0f;
                 }
+                if (pixel == sf::Color({0, 0, 150, 255}))
+                {
+                    grid[x][y] = 21;
+                    createBody(x,y);
+                }
                 if (pixel == sf::Color::Green)
                 {
                     grid[x][y] = 17;
@@ -384,6 +389,18 @@ void Level::draw(sf::RenderWindow &window) const
                 tile++;
 
                 window.draw(deathStone);
+            }
+            if (cell == 21)
+            {
+                sf::Sprite block(Resources::get(textures::WaterTiles), 
+                    sf::IntRect({0, 0},{BLOCK_SIZE, BLOCK_SIZE}));
+
+                block.setOrigin({BLOCK_SIZE / 2.0f,BLOCK_SIZE / 2.0f});
+                block.setPosition(sf::Vector2f({tiles[tile]->GetPosition().x * SCALE, 
+                    tiles[tile]->GetPosition().y * SCALE}));
+                tile++;
+                
+                window.draw(block);
             }
             y++;
         }

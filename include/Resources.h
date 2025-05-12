@@ -8,7 +8,7 @@
 namespace textures
 {
 	enum ID { Pink = 0, White, Blue, 
-        LevelTiles, Back1, Back2, Back3, Back4, Back5,
+        LevelTiles, SpikeTiles, WaterTiles, Back1, Back2, Back3, Back4, Back5,
         StartMenu, PlayerSelect };
 }
 

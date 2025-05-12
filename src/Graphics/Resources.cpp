@@ -13,6 +13,8 @@ Resources::Resources()
 
 	// Load all the world building images
 	load(textures::ID::LevelTiles, "Textures/Worlds/LevelTiles.png");
+	load(textures::ID::SpikeTiles, "Textures/Worlds/SpikeTiles.png");
+	load(textures::ID::WaterTiles, "Textures/Worlds/WaterTiles.png");
 	load(textures::ID::Back1, "Textures/Worlds/Background1.png");
 	load(textures::ID::Back2, "Textures/Worlds/Background2.png");
 	load(textures::ID::Back3, "Textures/Worlds/Background3.png");
