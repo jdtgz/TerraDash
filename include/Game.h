@@ -26,7 +26,6 @@ public:
 private:
     void processEvents();
     void update(const float dt);
-    void updatePlaying(const float dt);
     void updateView();
     void render();
 

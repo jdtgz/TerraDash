@@ -45,5 +45,7 @@ class Level
         std::vector<std::vector<int>> grid;
         std::vector<b2Body*> tiles;
         const int BLOCK_SIZE = 32.0f; 
+
+        sf::Vector2f death;
         sf::Vector2f goalPos;
 };
