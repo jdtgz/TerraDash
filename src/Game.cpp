@@ -103,6 +103,8 @@ void Game::updatePlaying(const float dt)
 	if (score < 0) score = 0;
 	scoreText->setString("Score: " + std::to_string(score));
 
+	//Lock the ScoreText in place
+	scoreText->setPosition(window->mapPixelToCoords(sf::Vector2i(20,20), window->getDefaultView()));
 
 	level.update(dt, player->getPosition());
 	player->update(dt);
@@ -126,11 +128,12 @@ void Game::render()
 	window->clear();
 	level.draw(*window);
 	player->draw(*window);
+	Level::debugDraw(*window);
 	
 	//Level::debugDraw(*window);
 
 	if (state == GameState::PLAYING)
-		window->draw(*scoreText);
+		drawOverlay(*scoreText);
 	else if (state == GameState::GAME_OVER)
 		drawOverlay(*gameOverText);
 	else if (state == GameState::WIN)
