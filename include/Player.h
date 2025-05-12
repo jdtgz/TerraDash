@@ -29,6 +29,7 @@ class Player : public ContactListener
 
         // Access var functions
         sf::Vector2f getPosition() const;
+        int getHealth() const { return hp; }
 
         virtual void OnBeginContact() override;
         virtual void OnEndContact() override;

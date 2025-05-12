@@ -188,6 +188,11 @@ sf::Vector2f Level::createFromImage(const sf::Image &levelImage)
                 playerPos.x = BLOCK_SIZE * x + BLOCK_SIZE / 2.0f; 
                 playerPos.y = BLOCK_SIZE * y + BLOCK_SIZE / 2.0f;
             }
+            if (pixel == sf::Color::Green)
+            {
+                goalPos = sf::Vector2f(BLOCK_SIZE * x + BLOCK_SIZE / 2.0f,
+                                    BLOCK_SIZE * y + BLOCK_SIZE / 2.0f);
+            }
         }
     }
 
@@ -248,4 +253,13 @@ void Level::debugDraw(sf::RenderWindow& window)
     }
 
     world.DebugDraw();
+}
+
+bool Level::playerReachedGoal(const sf::Vector2f& playerPos) const
+{
+    float dx = playerPos.x - goalPos.x;
+    float dy = playerPos.y - goalPos.y;
+    float distanceSquared = dx * dx + dy * dy;
+
+    return distanceSquared < 900.0f; // adjust threshold for win radius
 }

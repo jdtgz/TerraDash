@@ -21,7 +21,7 @@ Player::Player(sf::Vector2f pos,  textures::ID txtID) : p_txt(txtID)
     b2FixtureDef fixDef{};
     fixDef.shape = &polyShape;
     fixDef.density = 1.0f;
-    fixDef.friction = 0.3f;
+    fixDef.friction = 0.0f;
     p_body->CreateFixture(&fixDef);
 
     b2CircleShape circleShape{};

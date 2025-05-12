@@ -42,16 +42,14 @@ void Resources::load(const textures::ID& id, const std::string& filename)
 
 sf::Texture& Resources::get(const textures::ID& id)
 {
-	std::map<textures::ID, sf::Texture*>::iterator 
-	found = textureMap.find(id);
+	auto found = textureMap.find(id);
 
-
-	// Prevents loading of a non-existing texture in map
 	if (found != textureMap.end())
-		return *textureMap[found->first];
+		return *found->second;
 	else
 	{
-		sf::Texture emptyTex;
-		return emptyTex;
+		static sf::Texture fallback;
+		std::cerr << "Missing texture for ID " << int(id) << std::endl;
+		return fallback;
 	}
 }

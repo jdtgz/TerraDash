@@ -15,7 +15,7 @@ bool playerSelection(sf::Sprite* s, sf::Sprite* sprites[], Animation anims[]);
 int main()
 {
     Resources gameTextures;
-    //int choice = runStartMenu();
+    int choice = runStartMenu();
     
     Game* game = new Game(textures::ID(2));
     game->run();
