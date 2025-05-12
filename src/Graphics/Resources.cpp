@@ -13,6 +13,8 @@ Resources::Resources()
 
 	// Load all the world building images
 	load(textures::ID::LevelTiles, "Textures/Worlds/LevelTiles.png");
+	load(textures::ID::SpikeTiles, "Textures/Worlds/SpikeTiles.png");
+	load(textures::ID::WaterTiles, "Textures/Worlds/WaterTiles.png");
 	load(textures::ID::Back1, "Textures/Worlds/Background1.png");
 	load(textures::ID::Back2, "Textures/Worlds/Background2.png");
 	load(textures::ID::Back3, "Textures/Worlds/Background3.png");
@@ -20,6 +22,8 @@ Resources::Resources()
 	load(textures::ID::Back5, "Textures/Worlds/Background5.png");
 	load(textures::ID::StartMenu, "Textures/Start Menu.png");
 	load(textures::ID::PlayerSelect, "Textures/Player Selection Menu.png");
+	load(textures::ID::GameOver, "Textures/Lose Menu.png");
+	load(textures::ID::GameWin, "Textures/Win Menu.png");
 }
 
 
@@ -42,16 +46,14 @@ void Resources::load(const textures::ID& id, const std::string& filename)
 
 sf::Texture& Resources::get(const textures::ID& id)
 {
-	std::map<textures::ID, sf::Texture*>::iterator 
-	found = textureMap.find(id);
+	auto found = textureMap.find(id);
 
-
-	// Prevents loading of a non-existing texture in map
 	if (found != textureMap.end())
-		return *textureMap[found->first];
+		return *found->second;
 	else
 	{
-		sf::Texture emptyTex;
-		return emptyTex;
+		static sf::Texture fallback;
+		std::cerr << "Missing texture for ID " << int(id) << std::endl;
+		return fallback;
 	}
 }

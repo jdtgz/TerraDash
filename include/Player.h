@@ -4,13 +4,14 @@
 #include <box2d/b2_world.h>
 #include <box2d/b2_body.h>
 #include <box2d/b2_polygon_shape.h>
+#include <box2d/b2_circle_shape.h>
 #include <box2d/b2_fixture.h>
 #include "Animation.h"
 #include "Resources.h"
 #include "Level.h"
 
 
-class Player
+class Player : public ContactListener
 {
     public:
         Player(sf::Vector2f p_pos, textures::ID txtID);
@@ -28,11 +29,15 @@ class Player
 
         // Access var functions
         sf::Vector2f getPosition() const;
+        int getHealth() const { return hp; }
 
+        virtual void OnBeginContact() override;
+        virtual void OnEndContact() override;
     private:
         // Loads all approprite textures for the player and inits the idle 
         // animation by default and applies it to the sprite obj p_visual
         void initAnimations();
+        void initPhysicalBody(sf::Vector2f pos);
 
         // Used to track state of player and adjust visuals + moves
         enum class state
@@ -63,11 +68,13 @@ class Player
         {
             RIGHT = 0,
             LEFT, 
-            IN_AIR,
+            UP,
+            RUN,
             COUNT
         };
         bool heading[move::COUNT];
-        bool key_movement[state::COUNT];
+        bool facingRight;
+        size_t isGrounded;
 
         b2Body* p_body;
         

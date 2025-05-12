@@ -3,7 +3,9 @@
 b2World Level::world { b2Vec2(0.0f, 9.8f) };
 Debug* Level::world_debugger{};
 
-constexpr float SCALE = 30.f; 
+constexpr float SCALE = 32.f;
+struct DeadlyTag {};
+static DeadlyTag DEADLY_TAG_INSTANCE; 
 
 class Debug : public b2Draw
 {
@@ -33,7 +35,7 @@ class Debug : public b2Draw
             for(int i = 0; i < vertexCount; i++)
                 shape.setPoint(i, sf::Vector2f({vertices[i].x * SCALE, vertices[i].y * SCALE}));
             
-            shape.setFillColor(sf::Color(color.r * 255, color.g * 255, color.b * 255, color.a * 255));
+            shape.setFillColor(sf::Color(color.r * 255, color.g * 255, color.b * 255, color.a * 120));
             
             target.draw(shape);
         }
@@ -59,7 +61,7 @@ class Debug : public b2Draw
             circle.setPosition({center.x * SCALE, center.y * SCALE});
             circle.setOrigin({radius * SCALE, radius * SCALE});
 
-            circle.setFillColor(sf::Color(color.r * 255, color.g * 255, color.b * 255, color.a * 80));
+            circle.setFillColor(sf::Color(color.r * 255, color.g * 255, color.b * 255, color.a * 120));
             
             target.draw(circle);
 
@@ -98,7 +100,7 @@ class Debug : public b2Draw
         {
             sf::CircleShape circle(size);
             circle.setPosition({p.x * SCALE, p.y * SCALE});
-            circle.setOrigin({size, size});
+            circle.setOrigin({size * SCALE, size * SCALE});
             circle.setFillColor(sf::Color(color.r * 255, color.g * 255, color.b * 255, color.a * 255));
 
             target.draw(circle);
@@ -108,14 +110,62 @@ class Debug : public b2Draw
 };
 
 
+class GlobalContactListener : public b2ContactListener
+{
+    public:
+        virtual void BeginContact(b2Contact* contact) override
+        {
+             auto fixtureA = contact->GetFixtureA();
+            auto fixtureB = contact->GetFixtureB();
+
+            uintptr_t tagA = fixtureA->GetUserData().pointer;
+            uintptr_t tagB = fixtureB->GetUserData().pointer;
+
+            if (tagA == reinterpret_cast<uintptr_t>(&DEADLY_TAG_INSTANCE))
+                Level::playerHitDeadly = true;
+
+            if (tagB == reinterpret_cast<uintptr_t>(&DEADLY_TAG_INSTANCE))
+                Level::playerHitDeadly = true;
+
+            // only treat as ContactListener* if it's not the deadly tag
+            if (tagA != reinterpret_cast<uintptr_t>(&DEADLY_TAG_INSTANCE)) {
+                if (auto* listenerA = reinterpret_cast<ContactListener*>(tagA))
+                    listenerA->OnBeginContact();
+            }
+
+            if (tagB != reinterpret_cast<uintptr_t>(&DEADLY_TAG_INSTANCE)) {
+                if (auto* listenerB = reinterpret_cast<ContactListener*>(tagB))
+                    listenerB->OnBeginContact();
+            }
+        }
+
+        virtual void EndContact(b2Contact* contact) override
+        {
+             ContactListener* listener = (ContactListener*)contact->GetFixtureA()->GetUserData().pointer;
+
+            if(listener)
+                listener->OnEndContact();
+
+            listener = (ContactListener*)contact->GetFixtureB()->GetUserData().pointer;
+
+            if(listener)
+                listener->OnEndContact();
+        }
+};
+
+
 Level::Level()
 {
+    background = new sf::Sprite(Resources::get(textures::Back1), 
+                            sf::IntRect({0, 0}, {1920, 1080}));
+    background->setOrigin({860.0f, 540.0f});
 }
 
 
 Level::~Level()
 {
     delete world_debugger;
+    delete background;
 }
 
 
@@ -131,31 +181,104 @@ sf::Vector2f Level::createFromImage(const sf::Image &levelImage)
         {
             sf::Color pixel = levelImage.getPixel(sf::Vector2u(x, y));
             
-            if(pixel == sf::Color::Black)
+            if(pixel.a < 255)
             {
-                grid[x][y] = 1;
-
-                // Create the body definition
-                b2BodyDef def{};
-                def.position.Set(
-                    (BLOCK_SIZE * x + BLOCK_SIZE / 2.0f) / SCALE, 
-                    (BLOCK_SIZE * y + BLOCK_SIZE / 2.0f) / SCALE);
-
-                // Create the body using pointers
-                b2Body* body = world.CreateBody(&def);
-                
-                // Create the polygon (square) shape for visuals
-                b2PolygonShape shape{};
-                shape.SetAsBox(BLOCK_SIZE / 2.0f / SCALE, BLOCK_SIZE / 2.0f / SCALE);
-                body->CreateFixture(&shape, 0.0f);
-                
-                tiles.push_back(body);
+                switch(pixel.a - 100)
+                {
+                    case int(TileType::SINGLE):
+                        grid[x][y] = int(TileType::SINGLE);
+                        break;
+                    
+                    // all top blocks
+                    case int(TileType::TOP1):
+                        grid[x][y] = int(TileType::TOP1);
+                        break;
+                    case int(TileType::TOP2):
+                        grid[x][y] = int(TileType::TOP2);
+                        break;
+                    case int(TileType::TOP3):
+                        grid[x][y] = int(TileType::TOP3);
+                        break;
+                    case int(TileType::TOP4):
+                        grid[x][y] = int(TileType::TOP4);
+                        break;
+                    case int(TileType::TOP5):
+                        grid[x][y] = int(TileType::TOP5);
+                        break;
+                    case int(TileType::TOP6):
+                        grid[x][y] = int(TileType::TOP6);
+                        break;
+                    case int(TileType::TOP7):
+                        grid[x][y] = int(TileType::TOP7);
+                        break;
+                    
+                    // all middle blocks
+                    case int(TileType::MID1):
+                        grid[x][y] = int(TileType::MID1);
+                        break;
+                    case int(TileType::MID2):
+                        grid[x][y] = int(TileType::MID2);
+                        break;
+                    case int(TileType::MID3):
+                        grid[x][y] = int(TileType::MID3);
+                        break;
+                    case int(TileType::MID4):
+                        grid[x][y] = int(TileType::MID4);
+                        break;
+                    
+                    // all bottom blocks
+                    case int(TileType::BOTTOM1):
+                        grid[x][y] = int(TileType::BOTTOM1);
+                        break;
+                    case int(TileType::BOTTOM2):
+                        grid[x][y] = int(TileType::BOTTOM2);
+                        break;
+                    case int(TileType::BOTTOM3):
+                        grid[x][y] = int(TileType::BOTTOM3);
+                        break;
+                    case int(TileType::BOTTOM4):
+                        grid[x][y] = int(TileType::BOTTOM4);
+                        break;
+                }
+                createBody(x,y);
             }
-            if(pixel == sf::Color::Blue)
+            else
             {
-                grid[x][y] = 2;
-                playerPos.x = BLOCK_SIZE * x + BLOCK_SIZE / 2.0f; 
-                playerPos.y = BLOCK_SIZE * y + BLOCK_SIZE / 2.0f;
+                if (pixel == sf::Color::Green)
+                {
+                    grid[x][y] = 17;
+                    createBody(x, y);
+                }
+                if (pixel == sf::Color({0, 0, 150, 255}))
+                {
+                    grid[x][y] = 18;
+                    
+                    b2BodyDef def{};
+                    def.position.Set(
+                        (BLOCK_SIZE * x + BLOCK_SIZE / 2.0f) / SCALE, 
+                        (BLOCK_SIZE * y + BLOCK_SIZE / 2.0f) / SCALE);
+
+                    // Create the body using pointers
+                    b2Body* body = world.CreateBody(&def);
+                    
+                    // Create the polygon (square) shape for visuals
+                    b2PolygonShape shape{};
+                    shape.SetAsBox(BLOCK_SIZE / 2.0f / SCALE, BLOCK_SIZE / 2.0f / SCALE);
+                    
+                    b2FixtureDef fixDef{};
+                    fixDef.shape = &shape;
+                    fixDef.isSensor = true;
+                    fixDef.userData.pointer = reinterpret_cast<uintptr_t>(&DEADLY_TAG_INSTANCE);
+                    
+                    body->CreateFixture(&fixDef);
+                    tiles.push_back(body);
+                }
+                if (pixel == sf::Color::Blue)
+                {
+                    grid[x][y] = 19;
+                    playerPos.x = BLOCK_SIZE * x + BLOCK_SIZE / 2.0f; 
+                    playerPos.y = BLOCK_SIZE * y + BLOCK_SIZE / 2.0f;
+                }
             }
         }
     }
@@ -164,19 +287,18 @@ sf::Vector2f Level::createFromImage(const sf::Image &levelImage)
 }
 
 
-void Level::init()
-{  
-}
-
-
-void Level::update(float dt)
+void Level::update(float dt, sf::Vector2f pos)
 {
-    world.Step(dt, 6 , 2);
+    world.Step(dt, 8, 3);
+    world.SetContactListener(new GlobalContactListener());
+    background->setPosition(pos);
 }
 
 
 void Level::draw(sf::RenderWindow &window) const
 {
+    window.draw(*background);
+
     int x = 0;
     int tile = 0;
     for(const auto& column : grid)
@@ -184,19 +306,118 @@ void Level::draw(sf::RenderWindow &window) const
         int y = 0;
         for(const auto& cell : column)
         {
-            if(cell == 1)
+
+            if(cell < 17 && cell > 0)
             {
+                // Select correct position for tile box
+                sf::Vector2i  rectPos({0, 0});
+                switch(cell)
+                {
+                    case int(TileType::SINGLE):
+                        rectPos.x = 32.0f;            
+                        break;
+                    
+                    // all top blocks
+                    case int(TileType::TOP1):
+                        rectPos.x = 32.0f * 0;
+                        rectPos.y = 32.0f;
+                        break;
+                    case int(TileType::TOP2):
+                        rectPos.x = 32.0f * 1;
+                        rectPos.y = 32.0f;
+                        break;
+                    case int(TileType::TOP3):
+                        rectPos.x = 32.0f * 2;
+                        rectPos.y = 32.0f;
+                        break;
+                    case int(TileType::TOP4):
+                        rectPos.x = 32.0f * 3;
+                        rectPos.y = 32.0f;
+                        break;
+                    case int(TileType::TOP5):
+                        rectPos.x = 32.0f * 4;
+                        rectPos.y = 32.0f;
+                        break;
+                    case int(TileType::TOP6):
+                        rectPos.x = 32.0f * 5;
+                        rectPos.y = 32.0f;
+                        break;
+                    case int(TileType::TOP7):
+                        rectPos.x = 32.0f * 6;
+                        rectPos.y = 32.0f;
+                        break;
+                    
+                    // all middle blocks
+                    case int(TileType::MID1):
+                        rectPos.x = 32.0f * 0;
+                        rectPos.y = 64.0f;
+                        break;
+                    case int(TileType::MID2):
+                        rectPos.x = 32.0f * 1;
+                        rectPos.y = 64.0f;
+                        break;
+                    case int(TileType::MID3):
+                        rectPos.x = 32.0f * 2;
+                        rectPos.y = 64.0f;
+                        break;
+                    case int(TileType::MID4):
+                        rectPos.x = 32.0f * 3;
+                        rectPos.y = 64.0f;
+                        break;
+                    
+                    // all bottom blocks
+                    case int(TileType::BOTTOM1):
+                        rectPos.x = 32.0f * 0;
+                        rectPos.y = 96.0f;
+                        break;
+                    case int(TileType::BOTTOM2):
+                        rectPos.x = 32.0f * 1;
+                        rectPos.y = 96.0f;
+                        break;
+                    case int(TileType::BOTTOM3):
+                        rectPos.x = 32.0f * 2;
+                        rectPos.y = 96.0f;
+                        break;
+                    case int(TileType::BOTTOM4):
+                        rectPos.x = 32.0f * 3;
+                        rectPos.y = 96.0f;
+                        break;
+                }
+
+                // Create the sprite for box object
                 sf::Sprite block(Resources::get(textures::LevelTiles), 
-                    sf::IntRect({32,0},{BLOCK_SIZE, BLOCK_SIZE}));
+                    sf::IntRect({rectPos.x, rectPos.y},{BLOCK_SIZE, BLOCK_SIZE}));
 
                 block.setOrigin({BLOCK_SIZE / 2.0f,BLOCK_SIZE / 2.0f});
-                b2Vec2 tmp_pos = tiles[tile]->GetPosition();
-
-                block.setPosition(sf::Vector2f({tmp_pos.x * SCALE, tmp_pos.y * SCALE}));
+                block.setPosition(sf::Vector2f({tiles[tile]->GetPosition().x * SCALE, 
+                    tiles[tile]->GetPosition().y * SCALE}));
+                tile++;
                 
                 window.draw(block);
+            }
+            else if (cell == 17)
+            {
+                sf::Sprite goalBall(Resources::get(textures::LevelTiles), 
+                    sf::IntRect({96, 0}, {BLOCK_SIZE, BLOCK_SIZE}));
                 
+                goalBall.setOrigin({BLOCK_SIZE / 2.0f,BLOCK_SIZE / 2.0f});
+                goalBall.setPosition(sf::Vector2f({tiles[tile]->GetPosition().x * SCALE, 
+                    tiles[tile]->GetPosition().y * SCALE}));
                 tile++;
+
+                window.draw(goalBall);
+            }
+            if (cell == 18)
+            {
+                sf::Sprite deathStone(Resources::get(textures::WaterTiles), 
+                    sf::IntRect({96, 16}, {BLOCK_SIZE, BLOCK_SIZE}));
+
+                deathStone.setOrigin({BLOCK_SIZE / 2.0f,BLOCK_SIZE / 2.0f});
+                deathStone.setPosition(sf::Vector2f({tiles[tile]->GetPosition().x * SCALE, 
+                    tiles[tile]->GetPosition().y * SCALE}));
+                tile++;
+
+                window.draw(deathStone);
             }
             y++;
         }
@@ -211,9 +432,39 @@ void Level::debugDraw(sf::RenderWindow& window)
     {
         sf::RenderTarget& tmp(window);
         world_debugger = new Debug(tmp);
-        world_debugger->SetFlags(b2Draw::e_centerOfMassBit);
+        world_debugger->SetFlags(b2Draw::e_shapeBit);
         world.SetDebugDraw(world_debugger);
     }
 
     world.DebugDraw();
+}
+
+
+bool Level::playerReachedGoal(const sf::Vector2f& playerPos) const
+{
+    float dx = playerPos.x - goalPos.x;
+    float dy = playerPos.y - goalPos.y;
+    float distanceSquared = dx * dx + dy * dy;
+
+    return distanceSquared < 900.0f; // adjust threshold for win radius
+}
+
+
+void Level::createBody(int x, int y)
+{
+    // Create the body definition
+    b2BodyDef def{};
+    def.position.Set(
+        (BLOCK_SIZE * x + BLOCK_SIZE / 2.0f) / SCALE, 
+        (BLOCK_SIZE * y + BLOCK_SIZE / 2.0f) / SCALE);
+
+    // Create the body using pointers
+    b2Body* body = world.CreateBody(&def);
+    
+    // Create the polygon (square) shape for visuals
+    b2PolygonShape shape{};
+    shape.SetAsBox(BLOCK_SIZE / 2.0f / SCALE, BLOCK_SIZE / 2.0f / SCALE);
+    body->CreateFixture(&shape, 0.0f);
+    
+    tiles.push_back(body);
 }
