@@ -6,6 +6,7 @@ Game::Game(textures::ID p_id)
 	window = new sf::RenderWindow(sf::VideoMode({ 1920, 1080 }), "TerraDash");
 	window->setFramerateLimit(144);
 
+	db = new Database("localhost");
 	// Init world and player 
 	sf::Image lvl;
 	if(!lvl.loadFromFile("Textures/Worlds/world1.png"))
@@ -27,7 +28,7 @@ Game::Game(textures::ID p_id)
 	font = new sf::Font(("Textures/Fonts/Michelin Bold.ttf"));
 	scoreText = new sf::Text(*font);
 	scoreText->setCharacterSize(24);
-	scoreText->setFillColor(sf::Color::White);
+	scoreText->setFillColor(sf::Color::Black);
 	scoreText->setPosition({100, 100});
 
 	gameOverText = new sf::Text(*font);
@@ -133,8 +134,10 @@ void Game::render()
 		drawOverlay(*scoreText);
 	else if (state == GameState::GAME_OVER)
 		drawOverlay(*gameOverText);
-	else if (state == GameState::WIN)
+	else if (state == GameState::WIN){
 		drawOverlay(*winText);
+		db->uploadRun(1, 1, score, static_cast<int>(timer.getElapsedTime().asSeconds()));
+		}
 
 	window->display();
 }
@@ -166,3 +169,4 @@ void Game::checkGameConditions()
 
 	Level::playerHitDeadly = false;
 }
+

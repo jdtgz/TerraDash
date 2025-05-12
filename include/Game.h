@@ -5,6 +5,7 @@
 #include "Player.h"
 #include "Animation.h"
 #include "Resources.h"
+#include "Database.h"
 
 enum class GameState {
     MENU,
@@ -22,6 +23,7 @@ public:
 
     void run();
     GameState getState() const { return state; }
+    
 
 private:
     void processEvents();
@@ -31,6 +33,9 @@ private:
 
     void drawOverlay(const sf::Text& text);
     void checkGameConditions();
+
+    //db implementation
+    Database *db;
 
     // Window Elements
     sf::RenderWindow* window;
