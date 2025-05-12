@@ -38,7 +38,7 @@ int runStartMenu()
     Animation c_anims[3];
     bool playerSelectionActive = false;
 
-    int id = -1;
+    int id = 0;
 
     sf::Clock clock;
     while(startMenu.isOpen())
