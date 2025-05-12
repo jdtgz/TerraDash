@@ -9,7 +9,7 @@
 
 int runStartMenu();
 
-bool playerSelection(sf::Sprite* s, sf::Sprite* sprites[], Animation anims[]);
+bool playerSelection(sf::Sprite& s, sf::Sprite* sprites[], Animation anims[]);
 
 
 int main()
@@ -28,10 +28,10 @@ int runStartMenu()
     sf::RenderWindow startMenu(sf::VideoMode({ 1024, 1024 }), "TerraDashMenu");
 
     // Init the background for the start menu
-    sf::Sprite* m_background = new sf::Sprite(Resources::get(textures::StartMenu));
-    m_background->setTextureRect(sf::IntRect({ 0, 0 }, { 1024, 1024 }));
-    m_background->setOrigin({ 512.0f, 512.0f });
-    m_background->setPosition({ 512.0f, 512.0f });
+    sf::Sprite m_background(Resources::get(textures::StartMenu));
+    m_background.setTextureRect(sf::IntRect({ 0, 0 }, { 1024, 1024 }));
+    m_background.setOrigin({ 512.0f, 512.0f });
+    m_background.setPosition({ 512.0f, 512.0f });
 
     // Init the player idle animations for selection
     sf::Sprite* c_sprites[3];
@@ -99,7 +99,7 @@ int runStartMenu()
 
         startMenu.clear();
 
-        startMenu.draw(*m_background);
+        startMenu.draw(m_background);
 
         // draw players
         if(playerSelectionActive)
@@ -111,7 +111,6 @@ int runStartMenu()
         startMenu.display();
     }
     
-    delete m_background;
     for(int i = 0; i < 3; i++)
         delete c_sprites[i];
 
@@ -119,13 +118,12 @@ int runStartMenu()
 }
 
 
-bool playerSelection(sf::Sprite* s, sf::Sprite* sprites[], Animation anims[])
+bool playerSelection(sf::Sprite& s, sf::Sprite* sprites[], Animation anims[])
 {
-    delete s;
-    s = new sf::Sprite(Resources::get(textures::PlayerSelect));
-    s->setTextureRect(sf::IntRect({ 0, 0 }, { 1024, 1024 }));
-    s->setOrigin({ 512.0f, 512.0f });
-    s->setPosition({ 512.0f, 512.0f });
+    s.setTexture(Resources::get(textures::PlayerSelect));
+    s.setTextureRect(sf::IntRect({ 0, 0 }, { 1024, 1024 }));
+    s.setOrigin({ 512.0f, 512.0f });
+    s.setPosition({ 512.0f, 512.0f });
 
     // Init the player animations and sprites
     sf::Vector2i size({32, 32});

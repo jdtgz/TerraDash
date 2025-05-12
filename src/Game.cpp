@@ -137,9 +137,10 @@ void Game::render()
 	{
 		sf::Sprite gameOverScreen(Resources::get(textures::GameOver));
 		gameOverScreen.setTextureRect(sf::IntRect({ 0, 0 }, { 1920, 1080 }));
-		gameOverScreen.setOrigin({960.f, 540.0f});
-    	gameOverScreen.setPosition(player->getPosition());
+		//gameOverScreen.setOrigin({960.f, 540.0f});
+    	gameOverScreen.setPosition(sf::Vector2f({0, 0}));
 
+		window->setView(window->getDefaultView());
 		window->draw(gameOverScreen);
 	}
 	else if (state == GameState::WIN)
@@ -149,6 +150,7 @@ void Game::render()
     	gameWinScreen.setOrigin({960.f, 540.0f});
     	gameWinScreen.setPosition(player->getPosition());
 		
+		window->setView(window->getDefaultView());
 		window->draw(gameWinScreen);
 	
 		db->uploadRun(1, 1, score, static_cast<int>(timer.getElapsedTime().asSeconds()));
