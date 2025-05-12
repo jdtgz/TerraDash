@@ -132,9 +132,23 @@ void Game::render()
 	if (state == GameState::PLAYING)
 		drawOverlay(*scoreText);
 	else if (state == GameState::GAME_OVER)
-		drawOverlay(*gameOverText);
+	{
+		sf::Sprite gameOverScreen(Resources::get(textures::StartMenu));
+		gameOverScreen.setTextureRect(sf::IntRect({ 0, 0 }, { 1092, 1080 }));
+    	gameOverScreen.setOrigin({ 860.0f, 540.0f });
+    	gameOverScreen.setPosition({ 860.0f, 540.0f });
+
+		window->draw(gameOverScreen);
+	}
 	else if (state == GameState::WIN)
-		drawOverlay(*winText);
+	{
+		sf::Sprite gameWinScreen(Resources::get(textures::StartMenu));
+		gameWinScreen.setTextureRect(sf::IntRect({ 0, 0 }, { 1092, 1080 }));
+    	gameWinScreen.setOrigin({ 860.0f, 540.0f });
+    	gameWinScreen.setPosition({ 860.0f, 540.0f });
+
+		window->draw(gameOverScreen);
+	}
 
 	window->display();
 }
