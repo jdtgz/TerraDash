@@ -41,6 +41,7 @@ class Level
         static Debug* world_debugger;
         bool playerReachedGoal(const sf::Vector2f& playerPos) const;
         static inline bool playerHitDeadly = false;
+        static inline bool playerHitWin = false;
         
 
     private:

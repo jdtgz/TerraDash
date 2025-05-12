@@ -126,19 +126,20 @@ void Game::updateView()
 void Game::render()
 {
 	window->clear();
-	level.draw(*window);
-	player->draw(*window);
-	
-	//Level::debugDraw(*window);
 
+	
 	if (state == GameState::PLAYING)
+	{
+		level.draw(*window);
+		player->draw(*window);
 		drawOverlay(*scoreText);
+	}
 	else if (state == GameState::GAME_OVER)
 	{
 		sf::Sprite gameOverScreen(Resources::get(textures::GameOver));
-		gameOverScreen.setTextureRect(sf::IntRect({ 0, 0 }, { 1920, 1080 }));
-		//gameOverScreen.setOrigin({960.f, 540.0f});
-    	gameOverScreen.setPosition(sf::Vector2f({0, 0}));
+		gameOverScreen.setTextureRect(sf::IntRect({ 0, 0 }, { 1024, 1024 }));
+		gameOverScreen.setOrigin({512.0f, 512.0f});
+    	gameOverScreen.setPosition({960.0f, 540.0f});
 
 		window->setView(window->getDefaultView());
 		window->draw(gameOverScreen);
@@ -146,9 +147,9 @@ void Game::render()
 	else if (state == GameState::WIN)
 	{
 		sf::Sprite gameWinScreen(Resources::get(textures::GameWin));
-		gameWinScreen.setTextureRect(sf::IntRect({ 0, 0 }, { 1920, 1080 }));
-    	gameWinScreen.setOrigin({960.f, 540.0f});
-    	gameWinScreen.setPosition(player->getPosition());
+		gameWinScreen.setTextureRect(sf::IntRect({ 0, 0 }, { 1024, 1024 }));
+    	gameWinScreen.setOrigin({512.f, 512.0f});
+    	gameWinScreen.setPosition({960.0f, 540.0f});
 		
 		window->setView(window->getDefaultView());
 		window->draw(gameWinScreen);
@@ -171,15 +172,16 @@ void Game::drawOverlay(const sf::Text& text)
 void Game::checkGameConditions()
 {
 	// Win check happens first — reaching goal wins immediately
-	if (state == GameState::PLAYING && level.playerReachedGoal(player->getPosition()))
+	if (state == GameState::PLAYING && Level::playerHitWin)
 	{
 		state = GameState::WIN;
 		return; // Prevents Game Over from overriding it
 	}
+	
 
 	// Game over due to health or deadly block
 	if (state == GameState::PLAYING &&
-		(player->getHealth() <= 0 || Level::playerHitDeadly))
+		 Level::playerHitDeadly)
 	{
 		state = GameState::GAME_OVER;
 	}

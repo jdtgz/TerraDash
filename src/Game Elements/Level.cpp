@@ -5,7 +5,9 @@ Debug* Level::world_debugger{};
 
 constexpr float SCALE = 32.f;
 struct DeadlyTag {};
+struct WinTag {};
 static DeadlyTag DEADLY_TAG_INSTANCE; 
+static WinTag WIN_TAG_INSTANCE;
 
 class Debug : public b2Draw
 {
@@ -115,25 +117,33 @@ class GlobalContactListener : public b2ContactListener
     public:
         virtual void BeginContact(b2Contact* contact) override
         {
-             auto fixtureA = contact->GetFixtureA();
+            auto fixtureA = contact->GetFixtureA();
             auto fixtureB = contact->GetFixtureB();
 
             uintptr_t tagA = fixtureA->GetUserData().pointer;
             uintptr_t tagB = fixtureB->GetUserData().pointer;
 
-            if (tagA == reinterpret_cast<uintptr_t>(&DEADLY_TAG_INSTANCE))
+            // Deadly collision
+            if (tagA == reinterpret_cast<uintptr_t>(&DEADLY_TAG_INSTANCE) || 
+                tagB == reinterpret_cast<uintptr_t>(&DEADLY_TAG_INSTANCE)) {
                 Level::playerHitDeadly = true;
+            }
 
-            if (tagB == reinterpret_cast<uintptr_t>(&DEADLY_TAG_INSTANCE))
-                Level::playerHitDeadly = true;
+            // Win collision
+            if (tagA == reinterpret_cast<uintptr_t>(&WIN_TAG_INSTANCE) || 
+                tagB == reinterpret_cast<uintptr_t>(&WIN_TAG_INSTANCE)) {
+                Level::playerHitWin = true;
+            }
 
-            // only treat as ContactListener* if it's not the deadly tag
-            if (tagA != reinterpret_cast<uintptr_t>(&DEADLY_TAG_INSTANCE)) {
+            // If neither deadly nor win, handle as ContactListener*
+            if (tagA != reinterpret_cast<uintptr_t>(&DEADLY_TAG_INSTANCE) &&
+                tagA != reinterpret_cast<uintptr_t>(&WIN_TAG_INSTANCE)) {
                 if (auto* listenerA = reinterpret_cast<ContactListener*>(tagA))
                     listenerA->OnBeginContact();
             }
 
-            if (tagB != reinterpret_cast<uintptr_t>(&DEADLY_TAG_INSTANCE)) {
+            if (tagB != reinterpret_cast<uintptr_t>(&DEADLY_TAG_INSTANCE) &&
+                tagB != reinterpret_cast<uintptr_t>(&WIN_TAG_INSTANCE)) {
                 if (auto* listenerB = reinterpret_cast<ContactListener*>(tagB))
                     listenerB->OnBeginContact();
             }
@@ -247,7 +257,26 @@ sf::Vector2f Level::createFromImage(const sf::Image &levelImage)
                 if (pixel == sf::Color::Green)
                 {
                     grid[x][y] = 17;
-                    createBody(x, y);
+
+                    b2BodyDef def{};
+                    def.position.Set(
+                        (BLOCK_SIZE * x + BLOCK_SIZE / 2.0f) / SCALE, 
+                        (BLOCK_SIZE * y + BLOCK_SIZE / 2.0f) / SCALE);
+                   
+                    // Create the body using pointers
+                    b2Body* body = world.CreateBody(&def);
+                    
+                    // Create the polygon (square) shape for visuals
+                    b2PolygonShape shape{};
+                    shape.SetAsBox(BLOCK_SIZE / 2.0f / SCALE, BLOCK_SIZE / 2.0f / SCALE);
+                    
+                    b2FixtureDef fixDef{};
+                    fixDef.shape = &shape;
+                    fixDef.isSensor = true;
+                    fixDef.userData.pointer = reinterpret_cast<uintptr_t>(&WIN_TAG_INSTANCE);
+                    
+                    body->CreateFixture(&fixDef);
+                    tiles.push_back(body);
                 }
                 if (pixel == sf::Color({0, 0, 150, 255}))
                 {

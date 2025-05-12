@@ -22,8 +22,8 @@ Resources::Resources()
 	load(textures::ID::Back5, "Textures/Worlds/Background5.png");
 	load(textures::ID::StartMenu, "Textures/Start Menu.png");
 	load(textures::ID::PlayerSelect, "Textures/Player Selection Menu.png");
-	load(textures::ID::GameOver, "Textures/Lose Menu.png");
-	load(textures::ID::GameWin, "Textures/Win Menu.png");
+	load(textures::ID::GameOver, "Textures/Lose Game.png");
+	load(textures::ID::GameWin, "Textures/Win Game.png");
 }
 
 
