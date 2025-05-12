@@ -141,12 +141,16 @@ class GlobalContactListener : public b2ContactListener
 
 Level::Level()
 {
+    background = new sf::Sprite(Resources::get(textures::Back1), 
+                            sf::IntRect({0, 0}, {1920, 1080}));
+    background->setOrigin({860.0f, 540.0f});
 }
 
 
 Level::~Level()
 {
     delete world_debugger;
+    delete background;
 }
 
 
@@ -161,7 +165,7 @@ sf::Vector2f Level::createFromImage(const sf::Image &levelImage)
         for(int y = 0; y < grid[x].size(); y++)
         {
             sf::Color pixel = levelImage.getPixel(sf::Vector2u(x, y));
-
+            
             if(pixel.a < 255)
             {
                 switch(pixel.a - 100)
@@ -253,11 +257,14 @@ void Level::update(float dt, sf::Vector2f pos)
 {
     world.Step(dt, 8, 3);
     world.SetContactListener(new GlobalContactListener());
+    background->setPosition(pos);
 }
 
 
 void Level::draw(sf::RenderWindow &window) const
 {
+    window.draw(*background);
+
     int x = 0;
     int tile = 0;
     for(const auto& column : grid)

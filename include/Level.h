@@ -51,6 +51,7 @@ class Level
             MID1, MID2, MID3, MID4,
             BOTTOM1, BOTTOM2, BOTTOM3, BOTTOM4
         };
+        sf::Sprite* background;
 
         std::vector<std::vector<int>> grid;
         std::vector<b2Body*> tiles;

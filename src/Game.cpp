@@ -127,7 +127,7 @@ void Game::render()
 	level.draw(*window);
 	player->draw(*window);
 	
-	Level::debugDraw(*window);
+	//Level::debugDraw(*window);
 
 	if (state == GameState::PLAYING)
 		drawOverlay(*scoreText);

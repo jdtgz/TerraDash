@@ -82,7 +82,7 @@ void Player::update(const float& dt)
     {
         if(heading[int(move::RUN)])
         {
-            vel.x += SPEED * 2.0f;
+            vel.x += SPEED * 1.35f;
             curr_animation = (isGrounded) ? state::RUN_RIGHT : state::JUMP_RIGHT;
         }
         else
@@ -95,7 +95,7 @@ void Player::update(const float& dt)
     {
         if(heading[int(move::RUN)])
         {
-            vel.x -= SPEED * 2.0f;
+            vel.x -= SPEED * 1.35f;
             curr_animation = (isGrounded) ? state::RUN_LEFT : state::JUMP_LEFT;
         }
         else
@@ -106,7 +106,7 @@ void Player::update(const float& dt)
     }
     if(heading[int(move::UP)] && isGrounded)
     {
-        vel.y = (heading[int(move::RUN)]) ? -JUMP_HEIGHT * 1.5f : -JUMP_HEIGHT;
+        vel.y = (heading[int(move::RUN)]) ? -JUMP_HEIGHT * 1.2f : -JUMP_HEIGHT;
 
         if(facingRight)
         {
