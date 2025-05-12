@@ -10,34 +10,13 @@ Player::Player(sf::Vector2f pos,  textures::ID txtID) : p_txt(txtID)
     initAnimations();
     p_visual->setPosition(pos);
 
-    b2BodyDef def{};
-    def.type = b2_dynamicBody;
-    def.position.Set(pos.x / SCALE, pos.y / SCALE);
-    def.fixedRotation = true;
-    p_body = Level::world.CreateBody(&def);
-    
-    b2PolygonShape polyShape{};
-    polyShape.SetAsBox(15.0f / SCALE, 15.0f / SCALE);
-    b2FixtureDef fixDef{};
-    fixDef.shape = &polyShape;
-    fixDef.density = 1.0f;
-    fixDef.friction = 0.3f;
-    p_body->CreateFixture(&fixDef);
-
-    b2CircleShape circleShape{};
-    circleShape.m_radius = 16.0f / SCALE;
-    circleShape.m_p.Set(0.0f, -16.0f / SCALE);
-    fixDef.shape = &circleShape;
-    p_body->CreateFixture(&fixDef);
-
-    circleShape.m_p.Set(0.0f, 16.0f / SCALE);
-    fixDef.userData.pointer = (uintptr_t)this;
-    p_body->CreateFixture(&fixDef);
+    initPhysicalBody(pos);
 
     for(int i = 0; i < int(move::COUNT); i++)
         heading[i] = false;
-    isGrounded = false;
-    sprint = false;
+
+    isGrounded = 0;
+    facingRight = true;
 
     hp = 10;
 }
@@ -54,10 +33,12 @@ void Player::keyPressed(sf::Keyboard::Scancode key)
     if(key == sf::Keyboard::Scan::Right)
     {
        heading[int(move::RIGHT)] = true;
+       facingRight = true;
     }
     else if(key == sf::Keyboard::Scan::Left)
     {
         heading[int(move::LEFT)] = true;
+        facingRight = false;
     }
     else if(key == sf::Keyboard::Scan::Up)
     {
@@ -65,7 +46,7 @@ void Player::keyPressed(sf::Keyboard::Scancode key)
     }
     else if(key == sf::Keyboard::Scan::LShift)
     {
-        sprint = true;
+        heading[int(move::RUN)] = true;
     }
 }
 
@@ -86,7 +67,7 @@ void Player::keyReleased(sf::Keyboard::Scancode key)
     }
     else if(key == sf::Keyboard::Scan::LShift)
     {
-        sprint = false;
+        heading[int(move::RUN)] = false;
     }
 }
 
@@ -96,13 +77,51 @@ void Player::update(const float& dt)
     // Update the movement of player
     b2Vec2 vel = p_body->GetLinearVelocity();
     vel.x = 0.0f;
-    if(heading[int(move::RIGHT)])
-        vel.x += (sprint) ? SPEED * 1.5f : SPEED;
-    if(heading[int(move::LEFT)])
-        vel.x -= (sprint) ? SPEED * 1.5f : SPEED;
-    if(heading[int(move::UP)] && isGrounded)
-        vel.y = (sprint) ? -JUMP_HEIGHT * 1.5f : -JUMP_HEIGHT;
 
+    if(heading[int(move::RIGHT)])
+    {
+        if(heading[int(move::RUN)] && isGrounded == 0)
+        {
+            vel.x += SPEED * 2.0f;
+            curr_animation = (isGrounded) ? state::RUN_RIGHT : state::JUMP_RIGHT;
+        }
+        else
+        {
+            vel.x += SPEED;
+            curr_animation = (isGrounded) ? state::WALK_RIGHT : state::JUMP_RIGHT;
+        }
+    }
+    if(heading[int(move::LEFT)])
+    {
+        if(heading[int(move::RUN)])
+        {
+            vel.x -= SPEED * 2.0f;
+            curr_animation = (isGrounded) ? state::RUN_LEFT : state::JUMP_LEFT;
+        }
+        else
+        {
+            vel.x -= SPEED;
+            curr_animation = (isGrounded) ? state::WALK_LEFT : state::JUMP_LEFT;
+        }
+    }
+    if(heading[int(move::UP)] && isGrounded)
+    {
+        vel.y = (heading[int(move::RUN)]) ? -JUMP_HEIGHT * 1.5f : -JUMP_HEIGHT;
+
+        if(facingRight)
+        {
+            curr_animation = state::JUMP_RIGHT;
+        }
+        else
+        {
+            curr_animation = state::JUMP_LEFT;
+        }
+    }
+
+    if(vel.x == 0 && vel.y == 0)
+    {
+        curr_animation = (facingRight) ? state::IDLE_RIGHT : state::IDLE_LEFT;
+    }
     p_body->SetLinearVelocity(vel);
 
     b2Vec2 nPos = p_body->GetPosition();
@@ -129,13 +148,14 @@ sf::Vector2f Player::getPosition() const
 
 void Player::OnBeginContact()
 {
-    isGrounded = true;
+    isGrounded++;
 }
 
 
 void Player::OnEndContact()
 {
-    isGrounded = false;
+    if(isGrounded > 0)
+        isGrounded--;
 }
 
 
@@ -179,4 +199,37 @@ void Player::initAnimations()
     // Start player with the idle animation and set his position
     curr_animation = state::IDLE_RIGHT;
     p_animations[int(curr_animation)].applyToSprite(*p_visual);
+}
+
+
+void Player::initPhysicalBody(sf::Vector2f pos)
+{
+    b2BodyDef def{};
+    def.type = b2_dynamicBody;
+    def.position.Set(pos.x / SCALE, pos.y / SCALE);
+    def.fixedRotation = true;
+    p_body = Level::world.CreateBody(&def);
+    
+    b2FixtureDef fixDef{};
+    fixDef.density = 1.0f;
+    fixDef.friction = 0.0f;
+    
+    b2CircleShape circleShape{};
+    circleShape.m_radius = 16.0f / SCALE;
+    circleShape.m_p.Set(0.0f, -16.0f / SCALE);
+    fixDef.shape = &circleShape;
+    p_body->CreateFixture(&fixDef);
+    
+    circleShape.m_p.Set(0.0f, 16.0f / SCALE);
+    p_body->CreateFixture(&fixDef);
+    
+    b2PolygonShape polyShape{};
+    polyShape.SetAsBox(15.0f / SCALE, 15.0f / SCALE);
+    fixDef.shape = &polyShape;
+    p_body->CreateFixture(&fixDef);
+    
+    polyShape.SetAsBox(12.0f / SCALE, 5.0f / SCALE, b2Vec2(0.0f, 1.0f), 0.0f);
+    fixDef.userData.pointer = (uintptr_t)this;
+    fixDef.isSensor = true;
+    p_body->CreateFixture(&fixDef);
 }

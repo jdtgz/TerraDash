@@ -202,7 +202,7 @@ void Level::init()
 
 void Level::update(float dt, sf::Vector2f pos)
 {
-    world.Step(dt, 6, 2);
+    world.Step(dt, 8, 3);
     world.SetContactListener(new GlobalContactListener());
 }
 
@@ -243,7 +243,7 @@ void Level::debugDraw(sf::RenderWindow& window)
     {
         sf::RenderTarget& tmp(window);
         world_debugger = new Debug(tmp);
-        world_debugger->SetFlags(b2Draw::e_shapeBit);
+        world_debugger->SetFlags(b2Draw::e_centerOfMassBit);
         world.SetDebugDraw(world_debugger);
     }
 

@@ -15,9 +15,9 @@ bool playerSelection(sf::Sprite* s, sf::Sprite* sprites[], Animation anims[]);
 int main()
 {
     Resources gameTextures;
-    //int choice = runStartMenu();
+    int choice = runStartMenu();
     
-    Game* game = new Game(textures::ID(2));
+    Game* game = new Game(textures::ID(choice));
     game->run();
     delete game;
 }
@@ -57,6 +57,7 @@ int runStartMenu()
                 if(!playerSelectionActive)
                 {
                     sf::FloatRect startBox({318.0f , 695.0f}, {388.0f, 157.0f});
+                    
                     if(startBox.contains(cursor))
                         playerSelectionActive = playerSelection(m_background, c_sprites, c_anims);
                 }

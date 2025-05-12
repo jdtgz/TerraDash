@@ -36,7 +36,7 @@ class Player : public ContactListener
         // Loads all approprite textures for the player and inits the idle 
         // animation by default and applies it to the sprite obj p_visual
         void initAnimations();
-
+        void initPhysicalBody(sf::Vector2f pos);
 
         // Used to track state of player and adjust visuals + moves
         enum class state
@@ -68,12 +68,12 @@ class Player : public ContactListener
             RIGHT = 0,
             LEFT, 
             UP,
+            RUN,
             COUNT
         };
         bool heading[move::COUNT];
-        bool key_movement[state::COUNT];\
-        bool sprint;
-        bool isGrounded;
+        bool facingRight;
+        size_t isGrounded;
 
         b2Body* p_body;
         
