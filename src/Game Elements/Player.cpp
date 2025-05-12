@@ -204,6 +204,10 @@ void Player::initAnimations()
 
 void Player::initPhysicalBody(sf::Vector2f pos)
 {
+    sf::Vector2f size;
+    size.x = 16.0f;
+    size.y = 16.0f;
+
     b2BodyDef def{};
     def.type = b2_dynamicBody;
     def.position.Set(pos.x / SCALE, pos.y / SCALE);
@@ -215,20 +219,20 @@ void Player::initPhysicalBody(sf::Vector2f pos)
     fixDef.friction = 0.0f;
     
     b2CircleShape circleShape{};
-    circleShape.m_radius = 16.0f / SCALE;
-    circleShape.m_p.Set(0.0f, -16.0f / SCALE);
+    circleShape.m_radius = size.x / SCALE;
+    circleShape.m_p.Set(0.0f, -size.x / SCALE);
     fixDef.shape = &circleShape;
     p_body->CreateFixture(&fixDef);
     
-    circleShape.m_p.Set(0.0f, 16.0f / SCALE);
+    circleShape.m_p.Set(0.0f, size.x / SCALE);
     p_body->CreateFixture(&fixDef);
     
     b2PolygonShape polyShape{};
-    polyShape.SetAsBox(15.0f / SCALE, 15.0f / SCALE);
+    polyShape.SetAsBox(size.x / SCALE, size.y / SCALE);
     fixDef.shape = &polyShape;
     p_body->CreateFixture(&fixDef);
     
-    polyShape.SetAsBox(12.0f / SCALE, 5.0f / SCALE, b2Vec2(0.0f, 1.0f), 0.0f);
+    polyShape.SetAsBox((size.x - 4.0f) / SCALE, (size.y * 0.2f) / SCALE, b2Vec2(0.0f, 1.0f), 0.0f);
     fixDef.userData.pointer = (uintptr_t)this;
     fixDef.isSensor = true;
     p_body->CreateFixture(&fixDef);

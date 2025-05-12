@@ -182,7 +182,7 @@ sf::Vector2f Level::createFromImage(const sf::Image &levelImage)
                 
                 tiles.push_back(body);
             }
-            if(pixel == sf::Color::Blue)
+            if (pixel == sf::Color::Blue)
             {
                 grid[x][y] = 2;
                 playerPos.x = BLOCK_SIZE * x + BLOCK_SIZE / 2.0f; 
@@ -190,8 +190,47 @@ sf::Vector2f Level::createFromImage(const sf::Image &levelImage)
             }
             if (pixel == sf::Color::Green)
             {
+                grid[x][y] = 10;
                 goalPos = sf::Vector2f(BLOCK_SIZE * x + BLOCK_SIZE / 2.0f,
                                     BLOCK_SIZE * y + BLOCK_SIZE / 2.0f);
+
+                // Create the body definition
+                b2BodyDef def{};
+                def.position.Set(
+                    (BLOCK_SIZE * x + BLOCK_SIZE / 2.0f) / SCALE, 
+                    (BLOCK_SIZE * y + BLOCK_SIZE / 2.0f) / SCALE);
+
+                // Create the body using pointers
+                b2Body* body = world.CreateBody(&def);
+                
+                // Create the polygon (square) shape for visuals
+                b2PolygonShape shape{};
+                shape.SetAsBox(BLOCK_SIZE / 2.0f / SCALE, BLOCK_SIZE / 2.0f / SCALE);
+                body->CreateFixture(&shape, 0.0f);
+                
+                tiles.push_back(body);
+            }
+            if (pixel == sf::Color::Magenta)
+            {
+                 grid[x][y] = 11;
+                 death = sf::Vector2f(BLOCK_SIZE * x + BLOCK_SIZE / 2.0f,
+                                    BLOCK_SIZE * y + BLOCK_SIZE / 2.0f);
+
+                // Create the body definition
+                b2BodyDef def{};
+                def.position.Set(
+                    (BLOCK_SIZE * x + BLOCK_SIZE / 2.0f) / SCALE, 
+                    (BLOCK_SIZE * y + BLOCK_SIZE / 2.0f) / SCALE);
+
+                // Create the body using pointers
+                b2Body* body = world.CreateBody(&def);
+                
+                // Create the polygon (square) shape for visuals
+                b2PolygonShape shape{};
+                shape.SetAsBox(BLOCK_SIZE / 2.0f / SCALE, BLOCK_SIZE / 2.0f / SCALE);
+                body->CreateFixture(&shape, 0.0f);
+                
+                tiles.push_back(body);
             }
         }
     }
@@ -235,6 +274,35 @@ void Level::draw(sf::RenderWindow &window) const
                 
                 tile++;
             }
+            else if (cell == 10)
+            {
+                sf::Sprite goalBall(Resources::get(textures::LevelTiles), 
+                    sf::IntRect({96, 0}, {BLOCK_SIZE, BLOCK_SIZE}));
+                
+                goalBall.setOrigin({BLOCK_SIZE / 2.0f,BLOCK_SIZE / 2.0f});
+                b2Vec2 tmp_pos = tiles[tile]->GetPosition();
+
+                goalBall.setPosition(sf::Vector2f({tmp_pos.x * SCALE, tmp_pos.y * SCALE}));
+                
+                window.draw(goalBall);
+                
+                tile++;
+                
+            }
+            else if (cell == 11)
+            {
+                sf::Sprite deathStone(Resources::get(textures::LevelTiles), 
+                    sf::IntRect({0, 384}, {BLOCK_SIZE, BLOCK_SIZE}));
+
+                deathStone.setOrigin({BLOCK_SIZE / 2.0f,BLOCK_SIZE / 2.0f});
+                b2Vec2 tmp_pos = tiles[tile]->GetPosition();
+
+                deathStone.setPosition(sf::Vector2f({tmp_pos.x * SCALE, tmp_pos.y * SCALE}));
+                
+                window.draw(deathStone);
+                
+                tile++;
+            }
             y++;
         }
         x++;
@@ -248,7 +316,7 @@ void Level::debugDraw(sf::RenderWindow& window)
     {
         sf::RenderTarget& tmp(window);
         world_debugger = new Debug(tmp);
-        world_debugger->SetFlags(b2Draw::e_centerOfMassBit);
+        world_debugger->SetFlags(b2Draw::e_shapeBit);
         world.SetDebugDraw(world_debugger);
     }
 

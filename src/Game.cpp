@@ -44,6 +44,7 @@ Game::Game(textures::ID p_id)
 	winText->setPosition({600, 400});
 }
 
+
 Game::~Game()
 {
 	delete window;
@@ -53,6 +54,7 @@ Game::~Game()
 	delete scoreText;
 	delete winText;
 }
+
 
 void Game::run()
 {
@@ -65,16 +67,9 @@ void Game::run()
 		processEvents();
 
 		if (state == GameState::PLAYING)
-			updatePlaying(deltaTime);
+			update(deltaTime);
 
 		render();
-
-		if ((state == GameState::GAME_OVER || state == GameState::WIN) &&
-			sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::Enter))
-		{
-			state = GameState::EXIT;
-			window->close();
-		}
 	}
 }
 
@@ -89,6 +84,13 @@ void Game::processEvents()
 		else if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>())
 		{
 			player->keyPressed(keyPressed->scancode);
+
+			if((state == GameState::GAME_OVER || state == GameState::WIN) && 
+					keyPressed->scancode == sf::Keyboard::Scancode::Enter)
+			{
+				state = GameState::EXIT;
+				window->close();
+			}
 		}
 		else if (const auto* keyReleased = event->getIf<sf::Event::KeyReleased>())
 		{
@@ -97,7 +99,7 @@ void Game::processEvents()
 	}
 }
 
-void Game::updatePlaying(const float dt)
+void Game::update(const float dt)
 {
 	score = 1000 - static_cast<int>(timer.getElapsedTime().asSeconds());
 	if (score < 0) score = 0;
@@ -110,10 +112,6 @@ void Game::updatePlaying(const float dt)
 	updateView();
 }
 
-void Game::update(const float dt)
-{
-	// legacy
-}
 
 void Game::updateView()
 {
@@ -127,7 +125,7 @@ void Game::render()
 	level.draw(*window);
 	player->draw(*window);
 	
-	//Level::debugDraw(*window);
+	Level::debugDraw(*window);
 
 	if (state == GameState::PLAYING)
 		window->draw(*scoreText);
@@ -139,12 +137,14 @@ void Game::render()
 	window->display();
 }
 
+
 void Game::drawOverlay(const sf::Text& text)
 {
 	window->setView(window->getDefaultView());
 	window->draw(text);
 	window->setView(camera);
 }
+
 
 void Game::checkGameConditions()
 {
