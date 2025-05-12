@@ -100,6 +100,7 @@ void Game::processEvents()
 	}
 }
 
+
 void Game::update(const float dt)
 {
 	score = 1000 - static_cast<int>(timer.getElapsedTime().asSeconds());
@@ -135,19 +136,19 @@ void Game::render()
 	else if (state == GameState::GAME_OVER)
 	{
 		sf::Sprite gameOverScreen(Resources::get(textures::GameOver));
-		gameOverScreen.setTextureRect(sf::IntRect({ 0, 0 }, { 1092, 1080 }));
-    	gameOverScreen.setOrigin({ 860.0f, 540.0f });
-    	gameOverScreen.setPosition({ 860.0f, 540.0f });
+		gameOverScreen.setTextureRect(sf::IntRect({ 0, 0 }, { 1920, 1080 }));
+		gameOverScreen.setOrigin({960.f, 540.0f});
+    	gameOverScreen.setPosition(player->getPosition());
 
 		window->draw(gameOverScreen);
 	}
 	else if (state == GameState::WIN)
 	{
 		sf::Sprite gameWinScreen(Resources::get(textures::GameWin));
-		gameWinScreen.setTextureRect(sf::IntRect({ 0, 0 }, { 1092, 1080 }));
-    	gameWinScreen.setOrigin({ 860.0f, 540.0f });
-    	gameWinScreen.setPosition({ 860.0f, 540.0f });
-
+		gameWinScreen.setTextureRect(sf::IntRect({ 0, 0 }, { 1920, 1080 }));
+    	gameWinScreen.setOrigin({960.f, 540.0f});
+    	gameWinScreen.setPosition(player->getPosition());
+		
 		window->draw(gameWinScreen);
 	
 		db->uploadRun(1, 1, score, static_cast<int>(timer.getElapsedTime().asSeconds()));

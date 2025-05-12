@@ -158,7 +158,7 @@ Level::Level()
 {
     background = new sf::Sprite(Resources::get(textures::Back1), 
                             sf::IntRect({0, 0}, {1920, 1080}));
-    background->setOrigin({860.0f, 540.0f});
+    background->setOrigin({960.0f, 540.0f});
 }
 
 
